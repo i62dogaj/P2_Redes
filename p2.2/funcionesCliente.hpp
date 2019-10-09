@@ -1,5 +1,5 @@
-#ifndef FUNCIONES_HPP
-#define FUNCIONES_HPP
+#ifndef FUNCIONESCLIENTE_HPP
+#define FUNCIONESCLIENTE_HPP
 
 #include <string>
 #include <cstring>
@@ -30,24 +30,24 @@ vector<struct user> cargarUsuarios(){
 	string linea;
 	char *token;
 	char *cad;
-	
+
 	while(getline(file, linea)){
 		cout << linea << endl;
 		cad = new char [linea.length()+1];
 		strcpy(cad, linea.c_str());
-		if((token = strtok(cad, " ")) == NULL){ 
+		if((token = strtok(cad, " ")) == NULL){
 			perror("Error en strtok");
 			exit(EXIT_FAILURE);
 		}
 		usuario.login = token;
-		if((token = strtok(NULL, " ")) == NULL){ 
+		if((token = strtok(NULL, " ")) == NULL){
 			perror("Error en strtok");
 			exit(EXIT_FAILURE);
 		}
 		usuario.password = token;
 		//usuario.conectado = 0;
 		vectorU.push_back(usuario);
-		
+
 		//nUsers++;
 	}
 	//cout << "nUsers = " << nUsers << endl << endl << endl;
@@ -57,9 +57,9 @@ vector<struct user> cargarUsuarios(){
 		cout << vectorU[i].password << endl << endl;
 	}*/
 	//cout << "nUsers = " << int(vectorU.size()) << endl << endl;
-	
+
 	return vectorU;
-	
+
 }
 
 
@@ -81,7 +81,7 @@ bool check_password(string login, string password, vector<struct user> &v){
 				}
 				else{
 					v[i].conectado = 1;*/
-					return true;	
+					return true;
 				//}
 			}
 			else{
@@ -96,7 +96,7 @@ bool check_password(string login, string password, vector<struct user> &v){
 /*bool check_conexion(struct user usuario){
 	for(unsigned i = 0; i < v.size(); i++){
 		if(login == v[i].login){
-			if(password == v[i].password) return v[i].conectado;	
+			if(password == v[i].password) return v[i].conectado;
 		}
 	}
 }*/
@@ -114,8 +114,19 @@ bool log_in(vector<struct user> &v){
 		cout << "Introduzca password: ";
 		cin >> pass;
 		if(check_password(login, pass, v)) return true;
-		else return false;		
+		else return false;
 	}
+}
+
+int menu(){
+  int opcion = 0;
+	while((opcion != 1) && (opcion != 2)){
+	  cout << "[1] Iniciar sesión" << endl;
+	  cout << "[2] Registrarse" << endl;
+	  cout << "Escoge una opción: ";
+		cin >> opcion;
+	}
+	return opcion;
 }
 
 
