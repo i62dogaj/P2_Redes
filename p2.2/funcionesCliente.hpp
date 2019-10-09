@@ -1,14 +1,15 @@
 #ifndef FUNCIONESCLIENTE_HPP
 #define FUNCIONESCLIENTE_HPP
 
+#include <stdio.h>
+#include <errno.h>
+#include <stdlib.h>
 #include <string>
 #include <cstring>
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
+
 using namespace std;
 
 struct user{

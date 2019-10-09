@@ -94,14 +94,31 @@ int main ( )
 	FD_SET(s_cliente,&readfds);
 
 
-	//Deberíamos poder pasar ya la OPCION
+	/* ------------------------------------------------------------------
+		INICIO SESION
+	-------------------------------------------------------------------*/
 
+	//Envio opcion
 	opcion = menu();
-   cout << opcion << endl;
+  cout << opcion << endl;
 
+	bzero(buffer,sizeof(buffer));
 	sprintf(buffer, "%d", opcion);
-
 	send(s_cliente,buffer,sizeof(buffer),0);
+
+	//Envio log_in
+	std::cout << "Login" << '\n';
+	bzero(buffer,sizeof(buffer));
+	fgets(buffer,sizeof(buffer),stdin);
+	send(s_cliente,buffer,sizeof(buffer),0);
+
+
+	//Envio contraseña
+	std::cout << "Contraseña" << '\n';
+	bzero(buffer,sizeof(buffer));
+	fgets(buffer,sizeof(buffer),stdin);
+	send(s_cliente,buffer,sizeof(buffer),0);
+
 
 
 
