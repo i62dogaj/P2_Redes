@@ -34,8 +34,8 @@ int main ( )
 	----------------------------------------------------*/
 	vector<struct user> vectorU = cargarUsuarios();
 
-  opcion = menu();
-  cout << opcion << endl;
+
+
 
 
 
@@ -61,9 +61,11 @@ int main ( )
 	servidor.sin_addr.s_addr =  inet_addr("127.0.0.1");
 
 
+
+
 	/*---------------------------------------------
 	    Antes de conectarse al servidor, se loguea
-	----------------------------------------------*/
+	----------------------------------------------
 	while(conectado == 0){
 		if(log_in(vectorU)){
 			cout << "\nTe has logueado." << endl;
@@ -71,7 +73,7 @@ int main ( )
 		}
 		else cout << "\nNo te has podido loguear." << endl;
 	}
-
+	*/
 
 	/* ------------------------------------------------------------------
 		Se solicita la conexión con el servidor
@@ -90,6 +92,17 @@ int main ( )
 
 	FD_SET(0,&readfds);
 	FD_SET(s_cliente,&readfds);
+
+
+	//Deberíamos poder pasar ya la OPCION
+
+	opcion = menu();
+   cout << opcion << endl;
+
+	sprintf(buffer, "%d", opcion);
+
+	send(s_cliente,buffer,sizeof(buffer),0);
+
 
 
 	/* ------------------------------------------------------------------

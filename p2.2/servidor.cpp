@@ -5,12 +5,12 @@
 #include <netdb.h>
 #include <stdlib.h>
 #include <string.h>
-#include<signal.h>
+#include <signal.h>
 #include <unistd.h>
 #include <time.h>
 #include <arpa/inet.h>
 
-#include "funciones.hpp"
+#include "funcionesCliente.hpp"
 
 
 #define MSG_SIZE 250
@@ -193,11 +193,27 @@ int main ( )
 
 		            if(recibidos > 0){
 
+							std::cout << buffer << '\n';
+
 		                if(strcmp(buffer,"SALIR\n") == 0){
 
-		                    salirCliente(i,&readfds,&numClientes,arrayClientes);
+								  std::cout << "Has entrado en la opción SALIR del servidor" << '\n';
+								  salirCliente(i,&readfds,&numClientes,arrayClientes);
 
 		                }
+
+							 if(strcmp(buffer,"1") == 0){
+
+								 std::cout << "Has entrado en la opción 1 del servidor" << '\n';
+
+						   }
+
+							if(strcmp(buffer,"2") == 0){
+
+								std::cout << "Has entrado en la opción 2 del servidor" << '\n';
+
+						  }
+
 		                else{
 
 		                    sprintf(identificador,"%d: %s",i,buffer);
