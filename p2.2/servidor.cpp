@@ -5,12 +5,12 @@
 #include <netdb.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
+#include<signal.h>
 #include <unistd.h>
 #include <time.h>
 #include <arpa/inet.h>
 
-#include "funcionesServidor.hpp"
+#include "funciones.hpp"
 
 
 #define MSG_SIZE 250
@@ -25,7 +25,6 @@ void manejador(int signum);
 void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]);
 //bool log_in(vector<struct user> &v);
 void log_in(int new_sd);
-
 
 
 int main ( )
@@ -143,10 +142,12 @@ int main ( )
 		                    numClientes++;
 		                    FD_SET(new_sd,&readfds);
 
-												strcpy(buffer, "+Ok. Usuario\n");
-												send(new_sd,buffer,strlen(buffer),0);
+		                    strcpy(buffer, "+Ok. Usuario conectado\n");
+		                    send(new_sd,buffer,strlen(buffer),0);
+
 
 		                    for(j=0; j<(numClientes-1);j++){
+
 		                        bzero(buffer,sizeof(buffer));
 		                        sprintf(buffer, "Nuevo Cliente conectado: %d\n",new_sd);
 		                        send(arrayClientes[j],buffer,strlen(buffer),0);
@@ -181,7 +182,7 @@ int main ( )
 		                    exit(-1);
 		            }
 		            //Mensajes que se quieran mandar a los clientes (implementar)
-		            //log_in(new_sd);
+		            log_in(new_sd);
 		       			//send(new_sd,buffer,strlen(buffer),0);
 
 		        }
@@ -192,34 +193,27 @@ int main ( )
 
 		            if(recibidos > 0){
 
-									//std::cout << "Impresion buffer" << buffer << '\n';
-
 		                if(strcmp(buffer,"SALIR\n") == 0){
+		                    salirCliente(i,&readfds,&numClientes,arrayClientes);
+		                }
+										/*else if(strstr(buffer,"USUARIO") != NULL){
+		                    bool pass = false;
+												char usuario[20];
+												bzero();
+		                }*/
+		                else{
 
-								  std::cout << "Has entrado en la opción SALIR del servidor" << '\n';
-								  salirCliente(i,&readfds,&numClientes,arrayClientes);
+		                    sprintf(identificador,"%d: %s",i,buffer);
+		                    bzero(buffer,sizeof(buffer));
+		                    strcpy(buffer,identificador);
+
+
+		                    for(j=0; j<numClientes; j++)
+		                        if(arrayClientes[j] != i)
+		                            send(arrayClientes[j],buffer,strlen(buffer),0);
+
 
 		                }
-
-							 //FUNCION LOGUEO
-							 /*
-							 if(strstr(buffer,"USUARIO") != NULL){
-
-
-								 std::cout << "Has entrado en la opción 1 del servidor" << '\n';
-
-								 //send(new_sd,buffer,strlen(buffer),0); DESDE SERVIDOR
-								 //send(s_cliente,buffer,sizeof(buffer),0); DESDE CLIENTE
-
-								 recv(i,buffer,sizeof(buffer),0);
-								 std::cout << "Login -> " << buffer << '\n';
-
-								 recv(i,buffer,sizeof(buffer),0);
-								 std::cout << "Conttraseña -> " << buffer << '\n';
-
-						   }
-							 */
-
 
 
 		            }
@@ -239,4 +233,47 @@ int main ( )
 	close(sd);
 	return 0;
 
+}
+
+void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]){
+
+    char buffer[250];
+    int j;
+
+    close(socket);
+    FD_CLR(socket,readfds);
+
+    //Re-estructurar el array de clientes
+    for (j = 0; j < (*numClientes) - 1; j++)
+        if (arrayClientes[j] == socket)
+            break;
+    for (; j < (*numClientes) - 1; j++)
+        (arrayClientes[j] = arrayClientes[j+1]);
+
+    (*numClientes)--;
+
+    bzero(buffer,sizeof(buffer));
+    sprintf(buffer,"Desconexión del cliente: %d\n",socket);
+
+    for(j=0; j<(*numClientes); j++)
+        if(arrayClientes[j] != socket)
+            send(arrayClientes[j],buffer,strlen(buffer),0);
+
+
+}
+
+
+void manejador (int signum){
+    printf("\nSe ha recibido la señal sigint\n");
+    signal(SIGINT,manejador);
+
+    //Implementar lo que se desee realizar cuando ocurra la excepción de ctrl+c en el servidor
+}
+
+
+//bool log_in(vector<struct user> &v){
+void log_in(int new_sd){
+	char buffer[MSG_SIZE];
+	strcpy(buffer, "Introduzca login: \n");
+	send(new_sd,buffer,strlen(buffer),0);
 }

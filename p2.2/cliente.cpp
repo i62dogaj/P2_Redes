@@ -8,8 +8,8 @@
 #include <unistd.h>
 #include <time.h>
 #include <arpa/inet.h>
+#
 
-#include "funcionesCliente.hpp"
 
 
 int main ( )
@@ -27,17 +27,6 @@ int main ( )
 	int fin = 0;
 	int conectado = 0;
   int opcion;
-
-
-	/*---------------------------------------------------
-		Se cargan los usuarios ya registrados
-	----------------------------------------------------*/
-	vector<struct user> vectorU = cargarUsuarios();
-
-
-
-
-
 
 
 	/* --------------------------------------------------
@@ -61,20 +50,6 @@ int main ( )
 	servidor.sin_addr.s_addr =  inet_addr("127.0.0.1");
 
 
-
-
-	/*---------------------------------------------
-	    Antes de conectarse al servidor, se loguea
-	----------------------------------------------
-	while(conectado == 0){
-		if(log_in(vectorU)){
-			cout << "\nTe has logueado." << endl;
-			conectado = 1;
-		}
-		else cout << "\nNo te has podido loguear." << endl;
-	}
-	*/
-
 	/* ------------------------------------------------------------------
 		Se solicita la conexión con el servidor
 	-------------------------------------------------------------------*/
@@ -95,34 +70,6 @@ int main ( )
 
 
 	/* ------------------------------------------------------------------
-		INICIO SESION
-	-------------------------------------------------------------------*/
-
-	//Envio opcion
-	opcion = menu();
-  cout << opcion << endl;
-
-	bzero(buffer,sizeof(buffer));
-	sprintf(buffer, "%d", opcion);
-	send(s_cliente,buffer,sizeof(buffer),0);
-
-	//Envio log_in
-	std::cout << "Login" << '\n';
-	bzero(buffer,sizeof(buffer));
-	fgets(buffer,sizeof(buffer),stdin);
-	send(s_cliente,buffer,sizeof(buffer),0);
-
-
-	//Envio contraseña
-	std::cout << "Contraseña" << '\n';
-	bzero(buffer,sizeof(buffer));
-	fgets(buffer,sizeof(buffer),stdin);
-	send(s_cliente,buffer,sizeof(buffer),0);
-
-
-
-
-	/* ------------------------------------------------------------------
 		Se transmite la información
 	-------------------------------------------------------------------*/
 	do{
@@ -135,7 +82,6 @@ int main ( )
 		    bzero(buffer,sizeof(buffer));
 		    recv(s_cliente,buffer,sizeof(buffer),0);
 
-		    cout << "\n" << buffer;
 
 		    if(strcmp(buffer,"Demasiados clientes conectados\n") == 0)
 			fin =1;
