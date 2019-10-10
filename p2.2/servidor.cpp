@@ -268,46 +268,48 @@ int main ( )
 		                              send(i,buffer,strlen(buffer),0);
 		                              file.close();
 		                           }
-		                        }//CIERRE USUARIO
+										}//CIERRE USUARIO
 
 										else if(strstr(buffer, "PASSWORD")!=NULL){
-		                           if(FD_ISSET(i, &ask_password)){
-		                              char contrasena[20];
-		                              bzero(contrasena,sizeof(contrasena));
-		                              std::string search, user_to_search, passwd_to_search;
 
-		                              strncpy(contrasena, buffer+9, strlen(buffer)-10);
+											if(FD_ISSET(i, &ask_password)){
+												char contrasena[20];
+												bzero(contrasena,sizeof(contrasena));
+												std::string search, user_to_search, passwd_to_search;
 
-		                              file.open("USUARIOS.txt", std::fstream::in);
-		                              while(std::getline(file,search)){
-		                                 user_to_search=search.substr(0, strlen(usuarios[i].c_str()));
-		                                 if(strcmp(user_to_search.c_str(), usuarios[i].c_str())==0){
-		                                    passwd_to_search=search.substr(strlen(usuarios[i].c_str())+1, strlen(search.c_str())-strlen(usuarios[i].c_str())-1);
-		                                    if(strcmp(passwd_to_search.c_str(), contrasena)==0){
-		                                       FD_SET(i, &auth);
-		                                       FD_CLR(i, &ask_password);
-		                                       bzero(buffer,sizeof(buffer));
-		                                       strcpy(buffer,"+OK Contrasena Correcta. Log In hecho con éxito\0");
-		                                       send(i,buffer,strlen(buffer),0);
-		                                       file.close();
-		                                       break;
-		                                    }
-		                                    else{
-		                                       bzero(buffer,sizeof(buffer));
-		                                       strcpy(buffer,"-Err Contraseña equivocada\0");
-		                                       send(i,buffer,strlen(buffer),0);
-		                                       file.close();
-		                                       break;
-		                                    }
-		                                 }
-		                              }
-		                           }
-		                           else{
-		                              bzero(buffer,sizeof(buffer));
-		                              strcpy(buffer,"-Err Debe de introducir un usuario antes\0");
-		                              send(i,buffer,strlen(buffer),0);
-		                           }
-		                        }//CIERRE PASSWORD
+												strncpy(contrasena, buffer+9, strlen(buffer)-10);
+
+												file.open("USUARIOS.txt", std::fstream::in);
+												while(std::getline(file,search)){
+												   user_to_search=search.substr(0, strlen(usuarios[i].c_str()));
+												   if(strcmp(user_to_search.c_str(), usuarios[i].c_str())==0){
+												      passwd_to_search=search.substr(strlen(usuarios[i].c_str())+1, strlen(search.c_str())-strlen(usuarios[i].c_str())-1);
+												      if(strcmp(passwd_to_search.c_str(), contrasena)==0){
+												         FD_SET(i, &auth);
+												         FD_CLR(i, &ask_password);
+												         bzero(buffer,sizeof(buffer));
+												         strcpy(buffer,"+OK Contrasena Correcta. Log In hecho con éxito\0");
+												         send(i,buffer,strlen(buffer),0);
+												         file.close();
+												         break;
+												      }
+												      else{
+												         bzero(buffer,sizeof(buffer));
+												         strcpy(buffer,"-Err Contraseña equivocada\0");
+												         send(i,buffer,strlen(buffer),0);
+												         file.close();
+												         break;
+												      }
+												   }
+												}
+										   }
+
+											else{
+												bzero(buffer,sizeof(buffer));
+												strcpy(buffer,"-Err Debe de introducir un usuario antes\0");
+												send(i,buffer,strlen(buffer),0);
+											}
+										}//CIERRE PASSWORD
 
 
 										else{
