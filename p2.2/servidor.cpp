@@ -162,8 +162,6 @@ int main ( )
 		                }
 
 		            }
-
-
 		        }
 		        else if (i == 0){
 		            //Se ha introducido información de teclado
