@@ -143,9 +143,8 @@ int main ( )
 		                    numClientes++;
 		                    FD_SET(new_sd,&readfds);
 
-			           		strcpy(buffer, "Bienvenido al chat\n");
-
-                    send(new_sd,buffer,strlen(buffer),0);
+												strcpy(buffer, "+Ok. Usuario\n");
+												send(new_sd,buffer,strlen(buffer),0);
 
 		                    for(j=0; j<(numClientes-1);j++){
 		                        bzero(buffer,sizeof(buffer));
@@ -203,7 +202,8 @@ int main ( )
 		                }
 
 							 //FUNCION LOGUEO
-							 if(strcmp(buffer,"1") == 0){
+							 /*
+							 if(strstr(buffer,"USUARIO") != NULL){
 
 
 								 std::cout << "Has entrado en la opción 1 del servidor" << '\n';
@@ -218,12 +218,9 @@ int main ( )
 								 std::cout << "Conttraseña -> " << buffer << '\n';
 
 						   }
+							 */
 
-							if(strcmp(buffer,"2") == 0){
 
-								std::cout << "Has entrado en la opción 2 del servidor" << '\n';
-
-						  }
 
 		            }
 		            //Si el cliente introdujo ctrl+c
