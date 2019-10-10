@@ -181,7 +181,6 @@ int main ( )
 		            }
 		            //Mensajes que se quieran mandar a los clientes (implementar)
 		            log_in(new_sd);
-		       			//send(new_sd,buffer,strlen(buffer),0);
 
 		        }
 		        else{//Recibir del cliente
@@ -210,7 +209,6 @@ int main ( )
 		                        if(arrayClientes[j] != i)
 		                            send(arrayClientes[j],buffer,strlen(buffer),0);
 
-
 		                }
 
 
@@ -232,6 +230,8 @@ int main ( )
 	return 0;
 
 }
+
+
 
 void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]){
 
@@ -266,12 +266,4 @@ void manejador (int signum){
     signal(SIGINT,manejador);
 
     //Implementar lo que se desee realizar cuando ocurra la excepción de ctrl+c en el servidor
-}
-
-
-//bool log_in(vector<struct user> &v){
-void log_in(int new_sd){
-	char buffer[MSG_SIZE];
-	strcpy(buffer, "Introduzca login: \n");
-	send(new_sd,buffer,strlen(buffer),0);
 }
