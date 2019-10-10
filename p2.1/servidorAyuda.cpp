@@ -202,7 +202,8 @@ int main()
                               send(i,buffer,strlen(buffer),0);
                            }
                            file.close();
-                        }
+                        }//CIERRE REGISTRO
+
                         else if(strstr(buffer, "USUARIO")!=NULL){
                            bool ask_for_password=false;
                            char usuario[20];
@@ -232,7 +233,8 @@ int main()
                               send(i,buffer,strlen(buffer),0);
                               file.close();
                            }
-                        }
+                        }//CIERRE USUARIO
+
                         else if(strstr(buffer, "PASSWORD")!=NULL){
                            if(FD_ISSET(i, &ask_password)){
                               char contrasena[20];
@@ -270,7 +272,9 @@ int main()
                               strcpy(buffer,"-Err Debe de introducir un usuario antes\0");
                               send(i,buffer,strlen(buffer),0);
                            }
-                        }
+                        }//CIERRE PASSWORD
+
+
                         else if(strcmp(buffer, "INICIAR-PARTIDA\n")==0){
                            if(FD_ISSET(i, &auth)){
                               if(partidas.size()>0){
@@ -318,7 +322,8 @@ int main()
                               strcpy(buffer,"-Err Debe de autenticarse para jugar\0");
                               send(i,buffer,strlen(buffer),0);
                            }
-                        }
+                        }//CIERRE INICIAR-PARTIDA
+
                         else if(strstr(buffer, "DESCUBRIR")!=NULL){
                            if(FD_ISSET(i, &auth)){
                               if(FD_ISSET(i, &playing)){
@@ -375,7 +380,8 @@ int main()
                               strcpy(buffer,"-Err Debe de autenticarse para jugar\0");
                               send(i,buffer,strlen(buffer),0);
                            }
-                        }
+                        }//CIERRE DESCUBRIR
+
                         else if(strstr(buffer, "PONER-BANDERA")!=NULL){
                            if(FD_ISSET(i, &auth)){
                               if(FD_ISSET(i, &playing)){
@@ -433,7 +439,8 @@ int main()
                               strcpy(buffer,"-Err Debe de autenticarse para jugar\0");
                               send(i,buffer,strlen(buffer),0);
                            }
-                        }
+                        }//CIERRE PONER BANDERA
+
                         else{
                            bzero(buffer,sizeof(buffer));
                            strcpy(buffer,"-Err No se reconoce el comando\0");
