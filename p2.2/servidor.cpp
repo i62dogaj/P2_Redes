@@ -193,7 +193,7 @@ int main ( )
 
 		            if(recibidos > 0){
 
-									std::cout << "Impresion buffer" << buffer << '\n';
+									//std::cout << "Impresion buffer" << buffer << '\n';
 
 		                if(strcmp(buffer,"SALIR\n") == 0){
 
@@ -224,8 +224,6 @@ int main ( )
 								std::cout << "Has entrado en la opción 2 del servidor" << '\n';
 
 						  }
-
-
 
 		            }
 		            //Si el cliente introdujo ctrl+c
