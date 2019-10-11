@@ -211,34 +211,35 @@ int main ( )
 											bzero(passwd, sizeof(passwd));
 
 
-											//Encontramos la subcadena -p en la cadena buffer, localizamos donde se encuentra y la metemos en dummies
+											//Buscamos la subcadena "-u" en el buffer, si la encuentra mete la cadena que va desde "-u" hasta final de buffer
 											aux_user1=strstr(buffer, "-u");//+3 -> comienzo usuario
 											aux_user2=strstr(buffer, " -p");//final usuario
 
 											aux_passwd1=strstr(buffer, "-p");//+3 comienzo password
 
+											//IMPORTANTE -> TENEMOS QUE CONTROLAR QUE LA CONTRASEÑA NO SE PUEDA ESCRIBIR ANTES QUE EL USUARIO
 
 											//Si no se encuentra ocurrencia con -u ó -p
 											if((aux_user1 == NULL) or ((aux_passwd1 == NULL))){
-												std::cout << "Sentencia introducida incorrecta" << '\n';
+												std::cout << "Sentencia de registro incorrecta" << '\n';
 												break;
 											}
 
 											//Con estos -1 quitamos los '\0' || lenght_aux_user2 -> Tamaño desde " -p" hasta el final del buffer
-											int lenghtbuffer=strlen(buffer)-1, lenght_aux_user2=strlen(aux_user2)-1, lenght_aux_passwd1=strlen(aux_passwd1)-1;
+											int tam_buffer=strlen(buffer)-1, tam_aux_user2=strlen(aux_user2)-1, tam_aux_passwd1=strlen(aux_passwd1)-1;
 
-											strncpy(user, aux_user1+3, lenghtbuffer-lenght_aux_user2-12);//metemos en user, desde esa posicion, un numero x de bytes
-											strncpy(passwd, aux_passwd1+3, lenght_aux_passwd1-3);
+											strncpy(user, aux_user1+3, tam_buffer-tam_aux_user2-12);//metemos en user, desde esa posicion, un numero x de bytes
+											strncpy(passwd, aux_passwd1+3, tam_aux_passwd1-3);
 
 											std::string linea_fichero;
-											std::string usuario_busqueda;
+											std::string busqueda_usuario;
 											file.open("usuarios.txt", std::fstream::in);
 
 											//Controlamos si el usuario a registrar se encuentra ya en el archivo
 											while(std::getline(file,linea_fichero))//metemos en search usuario y contraseña (linea completa del fichero)
 											{
-												usuario_busqueda=linea_fichero.substr(0, strlen(user)); //metemos en user_to_search solo el usuario
-												if(strcmp(usuario_busqueda.c_str(), user)==0)
+												busqueda_usuario=linea_fichero.substr(0, strlen(user)); //metemos en user_to_search solo el usuario
+												if(strcmp(busqueda_usuario.c_str(), user)==0)
 												{
 													anadir=false;
 													bzero(buffer,sizeof(buffer));
@@ -247,6 +248,7 @@ int main ( )
 													break;
 												}
 											}
+
 											file.close();
 											file.open("usuarios.txt", std::fstream::app);
 
@@ -265,72 +267,81 @@ int main ( )
 										/*-----------------------------------------------------------------------
 										USUARIO
 										------------------------------------------------------------------------ */
+
 										else if(strstr(buffer, "USUARIO")!=NULL){
 
 											bool ask_for_password=false;
 											char usuario[20];
+											int tam_buffer=strlen(buffer);
 
 											bzero(usuario, sizeof(usuario));
-											std::string search, user_to_search;
-											int lenghtbuffer1=strlen(buffer);
 
-											strncpy(usuario, buffer+8, lenghtbuffer1-9);
+											std::string linea_fichero, busqueda_usuario;
+
+
+											strncpy(usuario, buffer+8, tam_buffer-9);
 											file.open("usuarios.txt", std::fstream::in);
 
-											while(std::getline(file,search)){
-											  user_to_search=search.substr(0, strlen(usuario));
-											  if(strcmp(user_to_search.c_str(), usuario)==0){
+											while(std::getline(file,linea_fichero)){
+											  busqueda_usuario=busqueda_usuario.substr(0, strlen(usuario));
+											  if(strcmp(busqueda_usuario.c_str(), usuario)==0){
 											     ask_for_password=true;
 											     usuarios[i]=usuario;
 											     FD_SET(i, &ask_password);
 											     bzero(buffer,sizeof(buffer));
-											     strcpy(buffer,"+OK El usuario existe. Introduzca la contrasena\0");
+											     strcpy(buffer,"+OK. Usuario correcto\0");
 											     send(i,buffer,strlen(buffer),0);
 											     file.close();
 											     break;
 											  }
 											}
+
 											if(!ask_for_password){
 											  bzero(buffer,sizeof(buffer));
-											  strcpy(buffer,"-Err El usuario no existe\0");
+											  strcpy(buffer,"-ERR. Usuario incorrecto\0");
 											  send(i,buffer,strlen(buffer),0);
 											  file.close();
 											}
 										}//CIERRE USUARIO
 
+										/*-----------------------------------------------------------------------
+										PASSWORD
+										------------------------------------------------------------------------ */
 										else if(strstr(buffer, "PASSWORD")!=NULL){
 
-											if(FD_ISSET(i, &ask_password)){
+											if(FD_ISSET(i, &ask_password)){//no se lo que hace
 												char contrasena[20];
 												bzero(contrasena,sizeof(contrasena));
-												std::string search, user_to_search, passwd_to_search;
+
+												std::string linea_fichero, busqueda_usuario, busqueda_pass;
 
 												strncpy(contrasena, buffer+9, strlen(buffer)-10);
 
 												file.open("usuarios.txt", std::fstream::in);
-												while(std::getline(file,search)){
-												   user_to_search=search.substr(0, strlen(usuarios[i].c_str()));
-												   if(strcmp(user_to_search.c_str(), usuarios[i].c_str())==0){
-												      passwd_to_search=search.substr(strlen(usuarios[i].c_str())+1, strlen(search.c_str())-strlen(usuarios[i].c_str())-1);
-												      if(strcmp(passwd_to_search.c_str(), contrasena)==0){
-												         FD_SET(i, &auth);
-												         FD_CLR(i, &ask_password);
-												         bzero(buffer,sizeof(buffer));
-												         strcpy(buffer,"+OK Contrasena Correcta. Log In hecho con éxito\0");
+
+												while(std::getline(file,linea_fichero)){
+												   busqueda_usuario=linea_fichero.substr(0, strlen(usuarios[i].c_str()));
+												   if(strcmp(busqueda_usuario.c_str(), usuarios[i].c_str())==0){
+												      busqueda_pass=linea_fichero.substr(strlen(usuarios[i].c_str())+1, strlen(linea_fichero.c_str())-strlen(usuarios[i].c_str())-1);
+												      if(strcmp(busqueda_pass.c_str(), contrasena)==0){
+												         FD_SET(i, &auth); //no se lo que hace
+												         FD_CLR(i, &ask_password); //no se lo que hace
+												         bzero(buffer,sizeof(buffer)); //a partir de aqui pasamos informacion al usuario
+												         strcpy(buffer,"+Ok. Usuario validado\0");
 												         send(i,buffer,strlen(buffer),0);
 												         file.close();
 												         break;
 												      }
 												      else{
 												         bzero(buffer,sizeof(buffer));
-												         strcpy(buffer,"-Err Contraseña equivocada\0");
+												         strcpy(buffer,"-ERR. Error en la validación\0");
 												         send(i,buffer,strlen(buffer),0);
 												         file.close();
 												         break;
 												      }
 												   }
 												}
-										   }
+										  }
 
 											else{
 												bzero(buffer,sizeof(buffer));
@@ -346,7 +357,7 @@ int main ( )
 											send(i,buffer,strlen(buffer),0);
 										}
 									}
-								 }
+								}
 								 //Si el cliente introdujo ctrl+c
 								 if(recibidos== 0)
 								 {
@@ -358,7 +369,7 @@ int main ( )
 					  }
 				 }
 			}
-	}
+		}
 
 	close(sd);
 	return 0;
