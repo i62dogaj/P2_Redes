@@ -212,14 +212,19 @@ int main ( )
 
 
 											//Buscamos la subcadena "-u" en el buffer, si la encuentra mete la cadena que va desde "-u" hasta final de buffer
+											//Si no la encuentra entonces mete NULL
 											aux_user1=strstr(buffer, "-u");//+3 -> comienzo usuario
 											aux_user2=strstr(buffer, " -p");//final usuario
 
 											aux_passwd1=strstr(buffer, "-p");//+3 comienzo password
 
-											//IMPORTANTE -> TENEMOS QUE CONTROLAR QUE LA CONTRASEÑA NO SE PUEDA ESCRIBIR ANTES QUE EL USUARIO
+											/*-----------------------------------------------------------------------
+											CONSIDERACIONES
+										 CONTROLAR QUE LA CONTRASEÑA NO SE PUEDA ESCRIBIR ANTES QUE EL USUARIO
+										 CONTROLAR QUE ESTANDO UN USUARIO CONECTADO NADIE MAS PUEDA ACCEDER CON ESA CUENTA
+										 ------------------------------------------------------------------------ */
 
-											//Si no se encuentra ocurrencia con -u ó -p
+											//Si no se encuentra ocurrencia con -u ó -p en el mensaje del cliente
 											if((aux_user1 == NULL) or ((aux_passwd1 == NULL))){
 												std::cout << "Sentencia de registro incorrecta" << '\n';
 												break;
@@ -236,9 +241,9 @@ int main ( )
 											file.open("usuarios.txt", std::fstream::in);
 
 											//Controlamos si el usuario a registrar se encuentra ya en el archivo
-											while(std::getline(file,linea_fichero))//metemos en search usuario y contraseña (linea completa del fichero)
+											while(std::getline(file,linea_fichero))//metemos en linea_fichero usuario y contraseña (linea completa del fichero)
 											{
-												busqueda_usuario=linea_fichero.substr(0, strlen(user)); //metemos en user_to_search solo el usuario
+												busqueda_usuario=linea_fichero.substr(0, strlen(user)); //metemos en busqueda_usuario solo el usuario
 												if(strcmp(busqueda_usuario.c_str(), user)==0)
 												{
 													anadir=false;
@@ -253,6 +258,8 @@ int main ( )
 											file.open("usuarios.txt", std::fstream::app);
 
 											//Si anadir sigue siendo true (usuario no encontrado en el archivo) entonces lo introducimos
+											//Si añadir false, quiere decir que el usuario ya se encuentra en la base de datos
+											//Por lo tanto no lo metemos
 											if(anadir)
 											{
 												file << user << " " << passwd;
@@ -270,7 +277,7 @@ int main ( )
 
 										else if(strstr(buffer, "USUARIO")!=NULL){
 
-											bool ask_for_password=false;
+											bool peticion_pass=false;
 											char usuario[20];
 											int tam_buffer=strlen(buffer);
 
@@ -279,15 +286,17 @@ int main ( )
 											std::string linea_fichero, busqueda_usuario;
 
 
-											strncpy(usuario, buffer+8, tam_buffer-9);
-											file.open("usuarios.txt", std::fstream::in);
+											strncpy(usuario, buffer+8, tam_buffer-9);//Metemos en usuario la cadena que va desde la posicion buffer+8
+											file.open("usuarios.txt", std::fstream::in);//hasta (tam_buffer-9) posiciones a la derecha
 
+											//Buscamos el usuario introducido por cliente en la base de datos
+											//En caso de encontrarlo ponemos variable de estado a true para proseguir con la contraseña
 											while(std::getline(file,linea_fichero)){
-											  busqueda_usuario=busqueda_usuario.substr(0, strlen(usuario));
+											  busqueda_usuario=linea_fichero.substr(0, strlen(usuario));
 											  if(strcmp(busqueda_usuario.c_str(), usuario)==0){
-											     ask_for_password=true;
+											     peticion_pass=true;
 											     usuarios[i]=usuario;
-											     FD_SET(i, &ask_password);
+											     FD_SET(i, &ask_password);//aqui ask_password
 											     bzero(buffer,sizeof(buffer));
 											     strcpy(buffer,"+OK. Usuario correcto\0");
 											     send(i,buffer,strlen(buffer),0);
@@ -296,7 +305,7 @@ int main ( )
 											  }
 											}
 
-											if(!ask_for_password){
+											if(!peticion_pass){
 											  bzero(buffer,sizeof(buffer));
 											  strcpy(buffer,"-ERR. Usuario incorrecto\0");
 											  send(i,buffer,strlen(buffer),0);
@@ -309,7 +318,7 @@ int main ( )
 										------------------------------------------------------------------------ */
 										else if(strstr(buffer, "PASSWORD")!=NULL){
 
-											if(FD_ISSET(i, &ask_password)){//no se lo que hace
+											if(FD_ISSET(i, &ask_password)){//no se lo que hace || aqui tambien ask_password
 												char contrasena[20];
 												bzero(contrasena,sizeof(contrasena));
 
@@ -324,11 +333,13 @@ int main ( )
 												   if(strcmp(busqueda_usuario.c_str(), usuarios[i].c_str())==0){
 												      busqueda_pass=linea_fichero.substr(strlen(usuarios[i].c_str())+1, strlen(linea_fichero.c_str())-strlen(usuarios[i].c_str())-1);
 												      if(strcmp(busqueda_pass.c_str(), contrasena)==0){
-												         FD_SET(i, &auth); //no se lo que hace
-												         FD_CLR(i, &ask_password); //no se lo que hace
+												         FD_SET(i, &auth); //meter socket i en el conjunto de sockets auth
+												         FD_CLR(i, &ask_password); //no se lo que hace || aqui tambien ask_password
+
 												         bzero(buffer,sizeof(buffer)); //a partir de aqui pasamos informacion al usuario
 												         strcpy(buffer,"+Ok. Usuario validado\0");
 												         send(i,buffer,strlen(buffer),0);
+
 												         file.close();
 												         break;
 												      }
@@ -353,13 +364,13 @@ int main ( )
 
 										else{
 											bzero(buffer,sizeof(buffer));
-											strcpy(buffer,"-Err No se reconoce el comando\0");
+											strcpy(buffer,"-ERR. Comando no renococido\0");
 											send(i,buffer,strlen(buffer),0);
 										}
 									}
 								}
 								 //Si el cliente introdujo ctrl+c
-								 if(recibidos== 0)
+								 if(recibidos == 0)
 								 {
 									  printf("El socket %d, ha introducido ctrl+c\n", i);
 									  //Eliminar ese socket
