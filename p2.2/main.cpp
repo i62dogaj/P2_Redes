@@ -1,13 +1,17 @@
-#include "funciones.hpp"
+#include "ficha.hpp"
+#include "jugador.hpp"
+#include <iostream>
+using namespace std;
+
 int main(){
 	cout << endl;
-	vector<struct user> vectorU = cargarUsuarios();
+	vector <Ficha> mano;
+	srand(time(NULL));
+	Ficha a;
+	cout << " |"<< a.getNI() << "|" << a.getND() << "|" << endl;
 
-	if(log_in(vectorU)){
-		cout << "\nTe has logueado." << endl;
-	}
-	/*else{
-		cout << "La contraseña no es correcta." << endl;
-	}*/
+	Jugador j;
+	j.mostrarMano();
+
 	cout << endl;
 }
