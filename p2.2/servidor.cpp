@@ -333,7 +333,7 @@ int main ( )
 												   if(strcmp(busqueda_usuario.c_str(), usuarios[i].c_str())==0){
 												      busqueda_pass=linea_fichero.substr(strlen(usuarios[i].c_str())+1, strlen(linea_fichero.c_str())-strlen(usuarios[i].c_str())-1);
 												      if(strcmp(busqueda_pass.c_str(), contrasena)==0){
-												         FD_SET(i, &auth); //no se lo que hace
+												         FD_SET(i, &auth); //meter socket i en el conjunto de sockets auth
 												         FD_CLR(i, &ask_password); //no se lo que hace || aqui tambien ask_password
 
 												         bzero(buffer,sizeof(buffer)); //a partir de aqui pasamos informacion al usuario
