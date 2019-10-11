@@ -89,8 +89,7 @@ int main ( )
         }
         else
         {
-
-            //He introducido información por teclado
+            //Cliente introduce informacion por teclado
             if(FD_ISSET(0,&auxfds)){
                 bzero(buffer,sizeof(buffer));
 
@@ -98,17 +97,12 @@ int main ( )
 
                 if(strcmp(buffer,"SALIR\n") == 0){
                         fin = 1;
-
                 }
 
                 send(sd,buffer,sizeof(buffer),0);
-
             }
 
-
         }
-
-
 
     }while(fin == 0);
 

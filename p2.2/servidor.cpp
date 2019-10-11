@@ -38,17 +38,17 @@ int main ( )
 	struct sockaddr_in sockname, from;
 	char buffer[MSG_SIZE];
 	socklen_t from_len;
-    fd_set readfds, auxfds, ask_password, auth, waiting_for_player, playing;
-    int salida;
-    int arrayClientes[MAX_CLIENTS];
-	 std::map<int, std::string> usuarios;
-    int numClientes = 0;
-    //contadores
-    int i,j,k;
+  fd_set readfds, auxfds, ask_password, auth, waiting_for_player, playing;
+  int salida;
+  int arrayClientes[MAX_CLIENTS];
+  std::map<int, std::string> usuarios;
+  int numClientes = 0;
+  //contadores
+  int i,j,k;
 	int recibidos;
-    char identificador[MSG_SIZE];
+  char identificador[MSG_SIZE];
 
-    int on, ret;
+  int on, ret;
 
 
 
@@ -107,7 +107,7 @@ int main ( )
 
 
     //Capturamos la señal SIGINT (Ctrl+c)
-    signal(SIGINT,manejador);
+    //signal(SIGINT,manejador);
 
 	/*-----------------------------------------------------------------------
 		El servidor acepta una petición
@@ -198,45 +198,65 @@ int main ( )
 
 									 else
 									 {
+										 /*-----------------------------------------------------------------------
+										 REGISTRO
+										 ------------------------------------------------------------------------ */
 										if(strstr(buffer, "REGISTRO")!=NULL)
 										{
 											bool anadir=true;
-											char *dummie, *dummie1;
+											char *dummie, *dummie1, *dummie3;
 											char user[20], passwd[20];
+
 											bzero(user, sizeof(user));
 											bzero(passwd, sizeof(passwd));
-											dummie=strstr(buffer, " -p");
-											dummie1=strstr(buffer, "-p");
-											int lenghtbuffer=strlen(buffer)-1, lenghtdummie=strlen(dummie)-1, lenghtdummie1=strlen(dummie1)-1;
-											strncpy(user, buffer+12, lenghtbuffer-lenghtdummie-12);
+
+
+											//Encontramos la subcadena -p en la cadena buffer, localizamos donde se encuentra y la metemos en dummies
+											dummie3=strstr(buffer, "-u");//+3 comienzo usuario
+
+											dummie=strstr(buffer, " -p");//final usuario
+											dummie1=strstr(buffer, "-p");//+3 comienzo password
+
+											if((dummie3 == NULL) or ((dummie1 == NULL))){
+												std::cout << "Sentencia introducida incorrecta" << '\n';
+												break;
+											}
+
+											int lenghtbuffer=strlen(buffer)-1, lenghtdummie=strlen(dummie)-1, lenghtdummie1=strlen(dummie1)-1, lenghtdummie3=strlen(dummie3)-1;
+
+											strncpy(user, dummie3+3, lenghtbuffer-lenghtdummie-12);//metemos en user, desde esa posicion, un numero x de bytes
 											strncpy(passwd, dummie1+3, lenghtbuffer-lenghtdummie1-3);
 
 											std::string search;
 											std::string user_to_search;
 											file.open("USUARIOS.txt", std::fstream::in);
 
-											while(std::getline(file,search))
+											//Controlamos si el usuario a registrar se encuentra ya en el archivo
+											while(std::getline(file,search))//metemos en search usuario y contraseña (linea completa del fichero)
 											{
-												user_to_search=search.substr(0, strlen(user));
+												user_to_search=search.substr(0, strlen(user)); //metemos en user_to_search solo el usuario
 												if(strcmp(user_to_search.c_str(), user)==0)
 												{
 													anadir=false;
 													bzero(buffer,sizeof(buffer));
-													strcpy(buffer,"-Err Ya existe ese usuario\0");
+													strcpy(buffer,"-ERR. Usuario existente\0");
 													send(i,buffer,strlen(buffer),0);
 													break;
 												}
 											}
 											file.close();
 											file.open("USUARIOS.txt", std::fstream::app);
+
+											//Si anadir sigue siendo true (usuario no encontrado en el archivo) entonces lo introducimos
 											if(anadir)
 											{
 												file << user << " " << passwd;
 												bzero(buffer,sizeof(buffer));
-												strcpy(buffer,"+Ok Usuario Registrado\0");
+												strcpy(buffer,"+Ok. Usuario Registrado\0");
 												send(i,buffer,strlen(buffer),0);
 											}
 											file.close();
+
 										}//CIERRE REGISTRO
 
 										else if(strstr(buffer, "USUARIO")!=NULL){
@@ -367,7 +387,7 @@ void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClie
 
 void manejador (int signum){
     printf("\nSe ha recibido la señal sigint\n");
-    signal(SIGINT,manejador);
+    //signal(SIGINT,manejador);
 
     //Implementar lo que se desee realizar cuando ocurra la excepción de ctrl+c en el servidor
 }
