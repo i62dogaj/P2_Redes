@@ -16,10 +16,14 @@ class Ficha{
 	public:
 		//Constructores
 		inline Ficha(){
-			int nI = rand()%6+1;
-			int nD = rand()%6+1;
+			int nI = rand()%6;
+			int nD = rand()%6;
 			setNI(nI);
 			setND(nD);
+		};
+		inline Ficha(int I, int D){
+			setNI(I);
+			setND(D);
 		};
 
 		//OBSERVADORES
