@@ -45,10 +45,23 @@ class Partida{
 			}
 			return false;
 		};
-    inline void monstrarFichasMonton(){
+
+    inline void mostrarMonton(){
 			for(int i = 0; i < monton_.size(); i++){
 				cout << " |" << monton_[i].getNI() << "|" << monton_[i].getND() << "|" << endl;
 			}
+      cout << endl;
+		};
+
+
+    inline void mostrarTablero(){
+      if(tablero_.size() == 0) cout << "Aún no hay fichas en el tablero.\n";
+      else{
+  			for(int i = 0; i < tablero_.size(); i++){
+  				cout << " |" << tablero_[i].getNI() << "|" << tablero_[i].getND() << "|";
+  			}
+        cout << endl;
+      }
 		};
 
 
@@ -77,10 +90,14 @@ class Partida{
 			return a;
 		};
 
-  /*  inline void anadirFichaTablero(int lugar){
-
+    inline void anadirFichaTablero(Ficha a, int lugar){
+      if(tablero_.size() == 0) tablero_.push_back(a);
+      else{
+        if(lugar == 0) tablero_.insert(tablero_.begin(), a);
+        else if(lugar == 1) tablero_.push_back(a);
+      }
     };
-*/
+
 
 };
 
