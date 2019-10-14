@@ -6,27 +6,24 @@ using namespace std;
 
 int main(){
 	cout << endl;
-	vector <Ficha> mano;
-	Ficha a;
-	Jugador j;
-	Partida p;
+	vector <Partida> partida;
+	Partida p(partida.size());
+	partida.push_back(p);
+	Jugador j1(&p);
+	Jugador j2(&p);
 	srand(time(NULL));
 
-	//cout << " |"<< a.getNI() << "|" << a.getND() << "|" << endl;
-
-	//j.mostrarMano();
-
-	p.mostrarFichas();
-	j.setManoInicial(p.repartir());
+	p.monstrarFichasMonton();
 	cout << endl << endl;
-	j.mostrarMano();
+	j1.mostrarMano();
+	j2.mostrarMano();
 	cout << endl << endl;
-	p.mostrarFichas();
+	p.monstrarFichasMonton();
 	cout << endl << endl;
-	j.robarFicha(p.robar());
-	j.mostrarMano();
+	j1.robarFicha(p.robar());
+	j1.mostrarMano();
 	cout << endl << endl;
-	p.mostrarFichas();
+	p.monstrarFichasMonton();
 
 	cout << endl;
 }
