@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <vector>
 #include "ficha.hpp"
+#include "partida.hpp"
 using namespace std;
 
 class Jugador{
@@ -15,16 +16,21 @@ class Jugador{
 		char password_;
 		int conectado_;
 		vector <Ficha> mano_;
+		int idPartida_;
 
 	public:
 		//Constructor
-		Jugador(){};
+		Jugador(Partida *p){
+			setManoInicial(p->repartir());
+			setConectado(1);
+		};
 
-		inline Jugador(int id, char login, char pass){
+		inline Jugador(int id, char login, char pass, Partida *p){
 			setID(id);
 			setLogin(login);
 			setPass(pass);
 			setConectado(1);
+			setManoInicial(p->repartir());
 		};
 
 		//OBSERVADORES
@@ -37,6 +43,7 @@ class Jugador{
 			for(int i = 0; i < mano_.size(); i++){
 			cout << " |" << mano_[i].getNI() << "|" << mano_[i].getND() << "|";
 			}
+			cout << endl;
 		};
 
 		//MODIFICADORES
@@ -47,6 +54,17 @@ class Jugador{
 		inline void setManoInicial(vector <Ficha> vec){	mano_ = vec;};
 		inline void robarFicha(Ficha a){ mano_.push_back(a); };
 
+	/*	inline void colocarFicha(Partida p){
+			int n;
+			Ficha a;
+			cout << "NI: ";
+			cin >> n;
+			a.setNI(n);
+			cout << "ND: ";
+			cin >> n;
+			a.setND(n);
+		};
+*/
 };
 
 

@@ -15,12 +15,7 @@ class Ficha{
 
 	public:
 		//Constructores
-		inline Ficha(){
-			int nI = rand()%6;
-			int nD = rand()%6;
-			setNI(nI);
-			setND(nD);
-		};
+		inline Ficha(){};
 		inline Ficha(int I, int D){
 			setNI(I);
 			setND(D);
@@ -29,6 +24,9 @@ class Ficha{
 		//OBSERVADORES
 		inline int getNI(){ return nI_;};
 		inline int getND(){ return nD_;};
+		inline void mostrarFicha(){
+			cout << " |" << getNI() << "|" << getND() << "|" << endl;
+		};
 
 		//MODIFICADORES
 		inline void setNI(int num){ nI_ = num; };
