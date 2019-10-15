@@ -10,6 +10,8 @@
 #include "jugador.hpp"
 using namespace std;
 
+class Jugador;
+
 class Partida{
 
   private:
@@ -17,7 +19,7 @@ class Partida{
     int nJugadores_;
     vector <Ficha> monton_;
     vector <Ficha> tablero_;
-    //vector <Jugador> jugadores_; //Para indicar el orden de juego
+    vector <Jugador> jugadores_; //Para indicar el orden de juego
     vector <Ficha> fDobles_; //Para las fichas dobles al iniciar la partida
 
   public:
@@ -41,6 +43,10 @@ class Partida{
     //OBSERVADORES
     inline int getIDPartida(){return idPartida_;};
     inline int getNJugadores(){return nJugadores_;};
+
+    inline int getExtI(){ return (tablero_.front()).getNI(); };
+    inline int getExtD(){ return (tablero_.back()).getND(); };
+
 
 
     /* En el vector fDobles_ se introducirá la mayor ficha doble
