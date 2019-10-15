@@ -27,6 +27,10 @@ class Ficha{
 		inline void mostrarFicha(){
 			cout << " |" << getNI() << "|" << getND() << "|" << endl;
 		};
+		inline bool esDoble(){
+			if(getNI() == getND()) return true;
+			else return false;
+		};
 
 		//MODIFICADORES
 		inline void setNI(int num){ nI_ = num; };

@@ -16,6 +16,7 @@ class Jugador{
 		char password_;
 		int conectado_;
 		vector <Ficha> mano_;
+		vector <Ficha> dobles_;
 		int idPartida_;
 
 	public:
@@ -24,6 +25,7 @@ class Jugador{
 			setManoInicial(p->repartir());
 			setConectado(1);
 			setIDPartida(p->getIDPartida());
+			setID(p->getNJugadores());
 		};
 
 		inline Jugador(int id, char login, char pass, Partida *p){
@@ -33,7 +35,11 @@ class Jugador{
 			setConectado(1);
 			setManoInicial(p->repartir());
 			setIDPartida(p->getIDPartida());
+			setID(p->getNJugadores());
 		};
+
+
+
 
 		//OBSERVADORES
 		inline int getID(){ return ID_;};
@@ -42,6 +48,7 @@ class Jugador{
 		inline int getConectado(){return conectado_;};
 		inline int getIDPartida(){return idPartida_;};
 		inline vector<Ficha> getMano(){ return mano_;};
+		inline int nDobles(){ return dobles_.size();};
 
 		inline void mostrarMano(){
 			for(int i = 0; i < mano_.size(); i++){
@@ -67,6 +74,42 @@ class Jugador{
 			}
 		};
 
+		inline bool tieneDobles(){
+			for(int i = 0; i < mano_.size(); i++){
+				if(mano_[i].esDoble()){
+					dobles_.push_back(mano_[i]);
+					return true;
+				}
+			}
+			return false;
+		};
+
+	/*	inline Ficha dobleMasAlta(){
+			Ficha aux;
+			if(nDobles() > 1){
+				//En caso de que haya más de una doble, las ordenamos de menor a mayor
+				for(int i = 0; i < dobles_.size(); i++){
+					for(int j = 0; j < dobles_.size(); j++){
+						if(dobles_[j] < dobles_[j+1]){ //CAMBIAERR
+							//aux = dobles_[j]
+							aux.setNI(dobles_[j].getNI());
+							aux.setND(dobles_[j].getND());
+							//dobles_[j] = dobles_[j+1]
+							dobles_[j].setNI(dobles_[j+1].getNI());
+							dobles_[j].setND(dobles_[j+1].getND());
+							//dobles_[j+1] = aux
+							dobles_[j+1].setNI(aux.getNI());
+							dobles_[j+1].setND(aux.getND());
+						}
+					}
+				}
+			}
+			//Devolvemos la mayor (la última si había más de una)
+			return dobles_.back();
+		};*/
+
+
+
 
 		//MODIFICADORES
 		inline void setID(int id){ ID_ = id; };
@@ -87,12 +130,26 @@ class Jugador{
 				cout << "ND: ";
 				cin >> n;
 				a.setND(n);
-				if(!existeFicha(a)) cout << "\nEsa ficha no existe en tu montón.\n";
+				if(!existeFicha(a)) cout << "\nEsa ficha no existe en tu montón. \nIntroduce una que sí tengas.\n\n";
 			}while(!existeFicha(a));
-			cout << "\n[0] Izquierda    [1] Derecha: ";
-			cin >> n;
-			p->anadirFichaTablero(a, n);
+			if(p->tableroVacio()) p->anadirFichaTablero(a, 2); //Si está vací, inserta directamente
+			else{
+				cout << "\n[1] Izquierda    [2] Derecha: ";
+				cin >> n;
+				p->anadirFichaTablero(a, n);
+			}
 			mano_.erase(mano_.begin()+(buscarFicha(a)));
+		};
+
+		inline void salirPartida(Partida *p){
+			p->menosNJugadores();
+			setIDPartida(-1);
+			if(!mano_.empty()){
+				for(int i = 0; i < mano_.size(); i++){
+					p->anadirFichaMonton(mano_[i]);
+				}
+				mano_.clear();
+		 	}
 		};
 
 };
