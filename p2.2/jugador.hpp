@@ -119,11 +119,13 @@ class Jugador{
 		inline void setIDPartida(int id){ idPartida_ = id;};
 		inline void setManoInicial(vector <Ficha> vec){	mano_ = vec;};
 		inline void robarFicha(Ficha a){ mano_.push_back(a); };
+		
 
 		inline void colocarFicha(Partida *p){
 			int n;
+			bool colocada = false;
 			Ficha a;
-			do{
+			do{ // ------ Escogemos la ficha ------
 				cout << "NI: ";
 				cin >> n;
 				a.setNI(n);
@@ -132,14 +134,34 @@ class Jugador{
 				a.setND(n);
 				if(!existeFicha(a)) cout << "\nEsa ficha no existe en tu montón. \nIntroduce una que sí tengas.\n\n";
 			}while(!existeFicha(a));
-			if(p->tableroVacio()) p->anadirFichaTablero(a, 2); //Si está vací, inserta directamente
+			// ------ Escogemos el extremo y la colocamos ------
+			if(p->tableroVacio()){
+				p->anadirFichaTablero(a, 1); //No importa el lugar, se inserta sin más
+				colocada = true;
+			}
 			else{
 				cout << "\n[1] Izquierda    [2] Derecha: ";
 				cin >> n;
-				p->anadirFichaTablero(a, n);
+				if(n == 1){
+					if(p->getExtI() == a.getND()){
+						p->anadirFichaTablero(a, n);
+						colocada = true;
+					}
+					else cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
+				}
+				else if(n == 2){
+					if(p->getExtD() == a.getNI()){
+						p->anadirFichaTablero(a, n);
+						colocada = true;
+					}
+					else cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
+				}
 			}
-			mano_.erase(mano_.begin()+(buscarFicha(a)));
+			// ------ Eliminamos la ficha de la mano ------
+			if(colocada) mano_.erase(mano_.begin()+(buscarFicha(a)));
+			p->mostrarTablero();
 		};
+
 
 		inline void salirPartida(Partida *p){
 			p->menosNJugadores();

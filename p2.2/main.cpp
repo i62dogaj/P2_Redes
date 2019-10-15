@@ -72,6 +72,8 @@ int main(){
 								a = p.robar();
 								j.robarFicha(a);
 								cout << "Has robado la ficha |" <<	a.getNI() << "|" << a.getND() << "| del montón.\n\n";
+								cout << "Tu mano queda:\n\n";
+								j.mostrarMano();
 							}
 							break;
 
