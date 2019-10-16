@@ -32,7 +32,7 @@ int main ( )
 
 	/*----------------------------------------------------
 		Descriptor del socket y buffer de datos
-	-----------------------------------------------------*/
+	-----------------------------------------------------
 	std::fstream file;
 	int sd, new_sd;
 	struct sockaddr_in sockname, from;
@@ -45,10 +45,33 @@ int main ( )
   int numClientes = 0;
   //contadores
   int i,j,k;
-	int recibidos;
+  int recibidos;
   char identificador[MSG_SIZE];
 
   int on, ret;
+*/
+
+	std::fstream file;
+	int sd, new_sd;
+	struct sockaddr_in sockname, from;
+	char buffer[MSG_SIZE];
+	socklen_t from_len;
+
+	fd_set readfds, auxfds, usuario_correcto, usuario_validado;
+
+	int salida;
+	int arrayClientes[MAX_CLIENTS];
+	int numClientes=0;
+	std::map<int, std::string> usuarios; //vector de usuarios donde asocia cada nombre de usuario a su socket
+
+	//contadores
+	int i,j,k;
+   int recibidos;
+   char identificador[MSG_SIZE];
+
+	int on, ret;
+
+
 
 
 
@@ -205,13 +228,13 @@ int main ( )
 										{
 											bool anadir=true;
 											char *auxUser1, *auxUser2, *auxPasswd1;
-											char user[20], passwd[20];
+											char usuario[20], contrasena[20];
 
 											std::string lineaFichero;
 											std::string busquedaUsuario;
 
-											bzero(user, sizeof(user));
-											bzero(passwd, sizeof(passwd));
+											bzero(usuario, sizeof(usuario));
+											bzero(contrasena, sizeof(contrasena));
 
 
 											//Buscamos la subcadena "-u" en el buffer, si la encuentra mete la cadena que va desde "-u" hasta final de buffer
@@ -236,8 +259,8 @@ int main ( )
 											//Con estos -1 quitamos los '\0' || lenght_aux_user2 -> Tamaño desde " -p" hasta el final del buffer
 											int tamBuffer=strlen(buffer)-1, tamAuxUser2=strlen(auxUser2)-1, tamAuxPasswd1=strlen(auxPasswd1)-1;
 
-											strncpy(user, auxUser1+3, tamBuffer-tamAuxUser2-12);//metemos en user, desde esa posicion, un numero x de bytes
-											strncpy(passwd, auxPasswd1+3, tamAuxPasswd1-3);
+											strncpy(usuario, auxUser1+3, tamBuffer-tamAuxUser2-12);//metemos en user, desde esa posicion, un numero x de bytes
+											strncpy(contrasena, auxPasswd1+3, tamAuxPasswd1-3);
 
 
 											file.open("usuarios.txt", std::fstream::in);
@@ -245,8 +268,8 @@ int main ( )
 											//Controlamos si el usuario a registrar se encuentra ya en el archivo
 											while(std::getline(file,lineaFichero))//metemos en linea_fichero usuario y contraseña (linea completa del fichero)
 											{
-												busquedaUsuario=lineaFichero.substr(0, strlen(user)); //metemos en busqueda_usuario solo el usuario
-												if(strcmp(busquedaUsuario.c_str(), user)==0)
+												busquedaUsuario=lineaFichero.substr(0, strlen(usuario)); //metemos en busqueda_usuario solo el usuario
+												if(strcmp(busquedaUsuario.c_str(), usuario)==0)
 												{
 													anadir=false;
 													bzero(buffer,sizeof(buffer));
@@ -264,7 +287,7 @@ int main ( )
 											//Por lo tanto no lo metemos
 											if(anadir)
 											{
-												file << user << " " << passwd;
+												file << usuario << " " << contrasena;
 												bzero(buffer,sizeof(buffer));
 												strcpy(buffer,"+Ok. Usuario Registrado\0");
 												send(i,buffer,strlen(buffer),0);
@@ -297,8 +320,11 @@ int main ( )
 											  busquedaUsuario=lineaFichero.substr(0, strlen(usuario));
 											  if(strcmp(busquedaUsuario.c_str(), usuario)==0){ //vamos comparando cada usuario del archivo con el introducido
 											     pedirContrasena=true;
-											     usuarios[i]=usuario; //mete el usuario en el vector en la posicion: socket de ese usuario
-											     FD_SET(i, &ask_password);//aqui ask_password
+											     usuarios[i]=usuario; //mete el usuario en el vector, en la posicion: socket de ese usuario
+
+											     FD_SET(i, &usuario_correcto);//añadimos el socket "i" (socket el usuario que estamos tratando ahora mismo)
+												   									//al conjunto de sockets usuarios_correctos
+
 											     bzero(buffer,sizeof(buffer));
 											     strcpy(buffer,"+OK. Usuario correcto\0");
 											     send(i,buffer,strlen(buffer),0);
@@ -320,7 +346,9 @@ int main ( )
 										------------------------------------------------------------------------ */
 										else if(strstr(buffer, "PASSWORD")!=NULL){
 
-											if(FD_ISSET(i, &ask_password)){//comprobamos si el usuario ha sido metido previamente
+											if(FD_ISSET(i, &usuario_correcto)){//comprobamos que el usuario con este socket
+																						  //se encuentre en usuarios correctos (usuario bien introducido)
+																					  	  //para dejarle introducir la contraseña
 												char contrasena[20];
 												bzero(contrasena,sizeof(contrasena));
 
@@ -331,15 +359,17 @@ int main ( )
 												file.open("usuarios.txt", std::fstream::in);
 
 												while(std::getline(file,lineaFichero)){
-												   busquedaUsuario=lineaFichero.substr(0, strlen(usuarios[i].c_str()));
+												   busquedaUsuario=lineaFichero.substr(0, strlen(usuarios[i].c_str())); //usuarios[i].c_str -> cadena con el usuario del socket i
 												   if(strcmp(busquedaUsuario.c_str(), usuarios[i].c_str())==0){
 												      busquedaPass=lineaFichero.substr(strlen(usuarios[i].c_str())+1, strlen(lineaFichero.c_str())-strlen(usuarios[i].c_str())-1);
 												      if(strcmp(busquedaPass.c_str(), contrasena)==0){
-												         FD_SET(i, &auth); //meter socket i en el conjunto de sockets auth
-																					//setea el socket de ese usuario para guardar que esta validado
-																					//y luego con fd_isset compruebo si un usuario que intenta iniciar partida esta validado o no
-																					//para permitirle entrar o no
-												         FD_CLR(i, &ask_password); //no se lo que hace || aqui tambien ask_password
+												         FD_SET(i, &usuario_validado); //añadimos el socket i al conjunto de usuarios_validados
+																									//posteriormente comprobaremos en el conjunto usuarios_validados
+																									//para dejar al usuario iniciar partida o no
+
+
+												         FD_CLR(i, &usuario_correcto); //borramos el socket i del conjunto de usuarios correctos
+																									//porque ahora pertenece al conjunto de usuarios validados
 
 												         bzero(buffer,sizeof(buffer)); //a partir de aqui pasamos informacion al usuario
 												         strcpy(buffer,"+Ok. Usuario validado\0");
@@ -359,12 +389,32 @@ int main ( )
 												}
 										  }
 
+										  //En caso de introducir el password antes que el usuario
 											else{
 												bzero(buffer,sizeof(buffer));
-												strcpy(buffer,"-ERR. Debe de introducir un usuario antes\0");
+												strcpy(buffer,"-ERR. Debe de introducir el usuario antes que la contraseña\0");
 												send(i,buffer,strlen(buffer),0);
 											}
 										}//CIERRE PASSWORD
+
+
+										/*-----------------------------------------------------------------------
+										INICIAR PARTIDA
+										------------------------------------------------------------------------ */
+										else if(strcmp(buffer, "INICIAR-PARTIDA\n")==0){
+
+		                           if(FD_ISSET(i, &usuario_validado)){//Comprobamos si el usuario esta validado para dejar entrar en una partida o no
+
+												bzero(buffer,sizeof(buffer));
+		                              strcpy(buffer,"Usuario validado ha entrado en una partida\0");
+		                              send(i,buffer,strlen(buffer),0);
+		                           }
+		                           else{
+		                              bzero(buffer,sizeof(buffer));
+		                              strcpy(buffer,"-ERR. Debe introducir usuario y contraseña correctamente para poder jugar\0");
+		                              send(i,buffer,strlen(buffer),0);
+		                           }
+		                        }//CIERRE INICIAR-PARTIDA
 
 
 										else{
