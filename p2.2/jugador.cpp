@@ -75,6 +75,7 @@ bool Jugador::tieneDobles(){
 	for(int i = 0; i < mano_.size(); i++){
 		if(mano_[i].esDoble()){
 			dobles_.push_back(mano_[i]);
+			fflush(stdout);
 			mano_[i].mostrarFicha();
 		}
 	}
@@ -83,34 +84,24 @@ bool Jugador::tieneDobles(){
 };
 
 Ficha Jugador::dobleMasAlta(){
-	Ficha aux;
-	if(nDobles() > 1){
-		//En caso de que haya más de una doble, las ordenamos de menor a mayor
-		for(int i = 0; i < dobles_.size(); i++){
-			for(int j = 0; j < dobles_.size(); j++){
-				//Basta con comprobar uno de los valores
-				if(j != dobles_.size()){
-					if(dobles_[j].getNI() > dobles_[j+1].getNI()){
-						//aux = dobles_[j]
-						aux.setNI(dobles_[j].getNI());
-						aux.setND(dobles_[j].getND());
-						//dobles_[j] = dobles_[j+1]
-						dobles_[j].setNI(dobles_[j+1].getNI());
-						dobles_[j].setND(dobles_[j+1].getND());
-						//dobles_[j+1] = aux
-						dobles_[j+1].setNI(aux.getNI());
-						dobles_[j+1].setND(aux.getND());
-					}
-				}
-			}
-		}
+	Ficha mayor;
+	//mayor = dobles_[0]
+  mayor.setNI(dobles_[0].getNI());
+  mayor.setND(dobles_[0].getND());
+	if(dobles_.size() > 1){
+	  for(int i = 0; i < dobles_.size(); i++){
+	    //Basta con comprobar uno de los valores
+	    if(mayor.getNI() < dobles_[i].getNI()){
+	      //mayor = dobles_[i]
+	      mayor.setNI(dobles_[i].getNI());
+	      mayor.setND(dobles_[i].getND());
+	    }
+	  }
 	}
-	aux.setNI((dobles_.back()).getNI());
-	aux.setND((dobles_.back()).getND());
-	cout << "Jugador " << getID() << endl;
-	aux.mostrarFicha();
-	//Devolvemos la mayor (la última si había más de una)
-	return aux;
+	cout << "Jugador " << getID() << "-> Ficha mayor: " << endl;
+	fflush(stdout);
+	mayor.mostrarFicha();
+	return mayor;
 };
 
 bool Jugador::puedePoner(Partida *p){

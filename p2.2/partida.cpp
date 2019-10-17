@@ -47,33 +47,40 @@ int Partida::getExtD(){
 int Partida::iniciarPartida(){
   Ficha mayor;
   int pos;
+	bool hayDobles = false;
   for(int i = 0; i < jugadores_.size(); i++){
-    if(jugadores_[i].tieneDobles()) fDobles_.push_back(jugadores_[i].dobleMasAlta());
+    if(jugadores_[i].tieneDobles()){
+			hayDobles = true;
+			fDobles_.push_back(jugadores_[i].dobleMasAlta());
+		}
   }
-	cout << "\n\n Fichas dobles:\n";
-	for(int i = 0; i < fDobles_.size(); i++){
-		fDobles_[i].mostrarFicha();
+	if(hayDobles){
+		cout << "\n\n Fichas dobles:\n";
+		for(int i = 0; i < fDobles_.size(); i++){
+			fflush(stdout);
+			fDobles_[i].mostrarFicha();
+		}
+	  //mayor = fDobles_[0]
+	  mayor.setNI(fDobles_[0].getNI());
+	  mayor.setND(fDobles_[0].getND());
+	  pos = 0;
+		if(fDobles_.size() > 1){
+		  for(int i = 0; i < fDobles_.size(); i++){
+		    //Basta con comprobar uno de los valores
+		    if(mayor.getNI() < fDobles_[i].getNI()){
+		      //mayor = fDobles_[i]
+		      mayor.setNI(fDobles_[i].getNI());
+		      mayor.setND(fDobles_[i].getND());
+		      pos = i;
+		    }
+		  }
+		}
+	  /* Devolvemos la posición de la ficha doble mayor,
+	     que coincide con la posición del jugador en el
+	     vector jugadores_, así como con su ID. Así, cada
+	     jugador comprobará si le toca a él empezar a jugar.*/
+	  return pos;
 	}
-  //mayor = fDobles_[0]
-  mayor.setNI(fDobles_[0].getNI());
-  mayor.setND(fDobles_[0].getND());
-  pos = 0;
-	if(fDobles_.size() > 1){
-	  for(int i = 0; i < fDobles_.size(); i++){
-	    //Basta con comprobar uno de los valores
-	    if(mayor.getNI() < fDobles_[i].getNI()){
-	      //mayor = fDobles_[i]
-	      mayor.setNI(fDobles_[i].getNI());
-	      mayor.setND(fDobles_[i].getND());
-	      pos = i;
-	    }
-	  }
-	}
-  /* Devolvemos la posición de la ficha doble mayor,
-     que coincide con la posición del jugador en el
-     vector jugadores_, así como con su ID. Así, cada
-     jugador comprobará si le toca a él empezar a jugar.*/
-  return pos;
 };
 
 bool Partida::tableroVacio(){
