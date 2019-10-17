@@ -252,7 +252,9 @@ int main ( )
 
 											//Si no se encuentra ocurrencia con -u ó -p en el mensaje del cliente
 											if((auxUser1 == NULL) or ((auxPasswd1 == NULL))){
-												std::cout << "Sentencia de registro incorrecta" << '\n';
+												bzero(buffer,sizeof(buffer));
+												strcpy(buffer,"-ERR. Sentencia de registro incorrecta\0");
+												send(i,buffer,strlen(buffer),0);
 												break;
 											}
 
@@ -287,7 +289,7 @@ int main ( )
 											//Por lo tanto no lo metemos
 											if(anadir)
 											{
-												file << "\n" << usuario << " " << contrasena;
+												file << usuario << " " << contrasena << "\n";
 												bzero(buffer,sizeof(buffer));
 												strcpy(buffer,"+Ok. Usuario Registrado\0");
 												send(i,buffer,strlen(buffer),0);
@@ -306,7 +308,6 @@ int main ( )
 											char usuario[20];
 											int tamBuffer=strlen(buffer);
 
-											char *auxUser1;
 
 											bzero(usuario, sizeof(usuario));
 
@@ -315,17 +316,19 @@ int main ( )
 
 											strncpy(usuario, buffer+8, tamBuffer-9);//Metemos en usuario la cadena que va desde la posicion buffer+8
 																								//hasta (tam_buffer-9) posiciones a la derecha
-											std::cout << "Impresion valor usuario: " << usuario << '\n';
+											std::cout << "\n" << "Impresion valor usuario: " << usuario << '\n';
 											file.open("usuarios.txt", std::fstream::in);
 
 											//Buscamos el usuario introducido por cliente en la base de datos
 											//En caso de encontrarlo ponemos variable de estado a true para proseguir con la contraseña
 											while(std::getline(file,lineaFichero)){
 
-												auxUser1 = strstr(lineaFichero.c_str(), " ");
+												//auxUser1 = strstr(lineaFichero.c_str(), " ");
 
-											  busquedaUsuario=lineaFichero.substr(0, strlen(auxUser1));
+											  busquedaUsuario=lineaFichero.substr(0, (strlen(strstr(lineaFichero.c_str(), " ")) - 1));
+
 											  std::cout << "Impresion valor busquedaUsuario: " << busquedaUsuario << '\n';
+
 											  if(strcmp(busquedaUsuario.c_str(), usuario)==0){ //vamos comparando cada usuario del archivo con el introducido
 											     pedirContrasena=true;
 											     usuarios[i]=usuario; //mete el usuario en el vector, en la posicion: socket de ese usuario
