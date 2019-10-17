@@ -113,6 +113,13 @@ Ficha Jugador::dobleMasAlta(){
 	return aux;
 };
 
+bool Jugador::puedePoner(Partida *p){
+	for(int i = 0; i < mano_.size(); i++){
+		if((p->getExtI() == mano_[i].getND()) || (p->getExtD() == mano_[i].getNI())) return true;
+	}
+	return false;
+};
+
 
 void Jugador::setID(int id){
 	ID_ = id;
