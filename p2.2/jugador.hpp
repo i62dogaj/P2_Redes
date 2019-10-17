@@ -39,6 +39,7 @@ class Jugador{
 		int buscarFicha(Ficha a);
 		bool tieneDobles();
 	  Ficha dobleMasAlta();
+		bool puedePoner(Partida *p);
 
 
 		//MODIFICADORES

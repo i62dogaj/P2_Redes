@@ -105,7 +105,7 @@ void Partida::mostrarMonton(){
 void Partida::mostrarTablero(){
   if(tableroVacio()) cout << "Aún no hay fichas en el tablero.\n";
   else{
-    cout << " TABLERO: \n\n ";
+    cout << "\n TABLERO: \n\n ";
 		for(int i = 0; i < tablero_.size(); i++){
 			cout << "|" << tablero_[i].getNI() << "|" << tablero_[i].getND() << "|";
 		}

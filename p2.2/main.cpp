@@ -64,11 +64,11 @@ int main(){
 
 			case 1:
 				cout << "Bienvenido a la partida.\n";
-				pos = p.iniciarPartida();
+				/*pos = p.iniciarPartida();
 				cout << "JUGADOR: " << pos << endl;
 				if(pos == j0.getID()) cout << "Comienza el jugador 0.\n\n";
 				else if(pos == j1.getID()) cout << "Comienza el jugador 1.\n\n";
-				else if(pos == j2.getID()) cout << "Comienza el jugador 2.\n\n";
+				else if(pos == j2.getID()) cout << "Comienza el jugador 2.\n\n";*/
 				//cout << "N Jugadores: " << p.getNJugadores() << endl;
 				do{
 					opt = MenuPartida();
@@ -85,29 +85,38 @@ int main(){
 							break;
 
 						case 2:
-							if(pos == j0.getID()) j0.mostrarMano();
+							/*if(pos == j0.getID()) j0.mostrarMano();
 							else if(pos == j1.getID()) j1.mostrarMano();
-							else if(pos == j2.getID()) j2.mostrarMano();
+							else if(pos == j2.getID()) j2.mostrarMano();*/
+							j0.mostrarMano();
 							break;
 
 						case 3:
-							if(pos == j0.getID()) j0.colocarFicha(&p);
+							/*if(pos == j0.getID()) j0.colocarFicha(&p);
 							else if(pos == j1.getID()) j1.colocarFicha(&p);
-							else if(pos == j2.getID()) j2.colocarFicha(&p);
+							else if(pos == j2.getID()) j2.colocarFicha(&p);*/
+							j0.colocarFicha(&p);
 							break;
 
 						case 4:
 							if(p.montonVacio()) cout << "No quedan fichas en el montón para robar.\n\n";
 							else{
-								a = p.robar();
-								if(pos == j0.getID()) j0.robarFicha(a);
-								else if(pos == j1.getID()) j1.robarFicha(a);
-								else if(pos == j2.getID()) j2.robarFicha(a);
-								cout << "Has robado la ficha |" <<	a.getNI() << "|" << a.getND() << "| del montón.\n\n";
-								cout << "Tu mano queda:\n\n";
-								if(pos == j0.getID()) j0.mostrarMano();
-								else if(pos == j1.getID()) j1.mostrarMano();
-								else if(pos == j2.getID()) j2.mostrarMano();
+								if(!j0.puedePoner(&p)){
+									a = p.robar();
+									/*if(pos == j0.getID()) j0.robarFicha(a);
+									else if(pos == j1.getID()) j1.robarFicha(a);
+									else if(pos == j2.getID()) j2.robarFicha(a);*/
+									j0.robarFicha(a);
+									cout << "Has robado la ficha |" <<	a.getNI() << "|" << a.getND() << "| del montón.\n\n";
+									cout << "Tu mano queda:\n\n";
+									/*if(pos == j0.getID()) j0.mostrarMano();
+									else if(pos == j1.getID()) j1.mostrarMano();
+									else if(pos == j2.getID()) j2.mostrarMano();*/
+									j0.mostrarMano();
+								}
+								else{
+									cout << "No hace falta robar.\n\n";
+								}
 							}
 							break;
 
