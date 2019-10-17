@@ -287,7 +287,7 @@ int main ( )
 											//Por lo tanto no lo metemos
 											if(anadir)
 											{
-												file << usuario << " " << contrasena;
+												file << usuario << " " << contrasena << "\n";
 												bzero(buffer,sizeof(buffer));
 												strcpy(buffer,"+Ok. Usuario Registrado\0");
 												send(i,buffer,strlen(buffer),0);
