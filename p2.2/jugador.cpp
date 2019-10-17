@@ -16,6 +16,7 @@ Jugador::Jugador(int id, string login, string pass, Partida *p){
 	setManoInicial(p->repartir());
 	setIDPartida(p->getIDPartida());
 	setID(id);
+	setPuntos(0);
 };
 
 int Jugador::getID(){
@@ -38,12 +39,25 @@ int Jugador::getIDPartida(){
 	return idPartida_;
 };
 
+int Jugador::getPuntos(){
+	int aux;
+	for(int i = 0; i < mano_.size(); i++){
+		aux = mano_[i].getNI() + mano_[i].getND();
+		puntos_ += aux;
+	}
+	return puntos_;
+};
+
 vector<Ficha> Jugador::getMano(){
 	return mano_;
 };
 
 int Jugador::nDobles(){
 	return dobles_.size();
+};
+
+int Jugador::nFichas(){
+	return mano_.size();
 };
 
 void Jugador::mostrarMano(){
@@ -71,12 +85,11 @@ int Jugador::buscarFicha(Ficha a){
 };
 
 bool Jugador::tieneDobles(){
-	cout << "Jugador " << getID() << endl;
 	for(int i = 0; i < mano_.size(); i++){
 		if(mano_[i].esDoble()){
 			dobles_.push_back(mano_[i]);
-			fflush(stdout);
-			mano_[i].mostrarFicha();
+			//fflush(stdout);
+			//mano_[i].mostrarFicha();
 		}
 	}
 	if(nDobles() > 0) return true;
@@ -98,13 +111,31 @@ Ficha Jugador::dobleMasAlta(){
 	    }
 	  }
 	}
-	cout << "Jugador " << getID() << "-> Ficha mayor: " << endl;
+	//cout << "Jugador " << getID() << "-> Ficha doble mayor: " << endl;
 	fflush(stdout);
-	mayor.mostrarFicha();
+	//mayor.mostrarFicha();
+	return mayor;
+};
+
+Ficha Jugador::masAlta(){
+	Ficha mayor;
+	int sumaMayor, aux;
+	mayor.setNI(mano_[0].getNI());
+	mayor.setND(mano_[0].getND());
+	sumaMayor = mano_[0].getNI() + mano_[0].getND();
+	for(int i = 0; i < mano_.size(); i++){
+		aux = mano_[i].getNI() + mano_[i].getND();
+		if(aux > sumaMayor){
+			mayor.setNI(mano_[i].getNI());
+			mayor.setND(mano_[i].getND());
+			sumaMayor = aux;
+		}
+	}
 	return mayor;
 };
 
 bool Jugador::puedePoner(Partida *p){
+	if(p->tableroVacio()) return true;
 	for(int i = 0; i < mano_.size(); i++){
 		if((p->getExtI() == mano_[i].getND()) || (p->getExtD() == mano_[i].getNI())) return true;
 	}
@@ -130,6 +161,10 @@ void Jugador::setConectado(int flag){
 
 void Jugador::setIDPartida(int id){
 	idPartida_ = id;
+};
+
+void Jugador::setPuntos(int puntos){
+	puntos_ = puntos;
 };
 
 void Jugador::setManoInicial(vector <Ficha> vec){
