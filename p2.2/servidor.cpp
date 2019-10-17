@@ -226,6 +226,21 @@ int main ( )
 										 ------------------------------------------------------------------------ */
 										if(strstr(buffer, "REGISTRO")!=NULL)
 										{
+
+											if (FD_ISSET(i, &usuario_correcto)) {
+												bzero(buffer,sizeof(buffer));
+												strcpy(buffer,"-ERR. Usuario correcto, no puede registrarse\0");
+												send(i,buffer,strlen(buffer),0);
+												break;
+											}
+
+											if (FD_ISSET(i, &usuario_validado)) {
+												bzero(buffer,sizeof(buffer));
+												strcpy(buffer,"-ERR. Usuario validado, no puede registrarse\0");
+												send(i,buffer,strlen(buffer),0);
+												break;
+											}
+
 											bool anadir=true;
 											char *auxUser1, *auxUser2, *auxPasswd1;
 											char usuario[20], contrasena[20];
@@ -303,6 +318,13 @@ int main ( )
 										------------------------------------------------------------------------ */
 
 										else if(strstr(buffer, "USUARIO")!=NULL){
+
+											if (FD_ISSET(i, &usuario_validado)) {
+												bzero(buffer,sizeof(buffer));
+												strcpy(buffer,"-ERR. Usuario validado, no puede inicar sesión\0");
+												send(i,buffer,strlen(buffer),0);
+												break;
+											}
 
 											bool pedirContrasena=false; //variable para controlar si pedimos contraseña o no
 											char usuario[20];
