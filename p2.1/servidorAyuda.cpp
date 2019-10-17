@@ -292,6 +292,7 @@ int main()
                                     strcpy(buffer,"+OK Comienza la partida.\0");
                                     send(i, buffer, strlen(buffer), 0);
                                     send(socket1 ,buffer,strlen(buffer),0);
+
                                  }
                                  else{
                                     //crear nuevo Panel
@@ -323,6 +324,7 @@ int main()
                               send(i,buffer,strlen(buffer),0);
                            }
                         }//CIERRE INICIAR-PARTIDA
+
 
                         else if(strstr(buffer, "DESCUBRIR")!=NULL){
                            if(FD_ISSET(i, &auth)){

@@ -226,6 +226,7 @@ int main ( )
 										 ------------------------------------------------------------------------ */
 										if(strstr(buffer, "REGISTRO")!=NULL)
 										{
+											//PONER USUARIO A ESTADO VALIDADO CUANDO SE REGISTRE CORRECTAMENTE
 
 											if (FD_ISSET(i, &usuario_correcto)) {
 												bzero(buffer,sizeof(buffer));
@@ -326,19 +327,34 @@ int main ( )
 												break;
 											}
 
+
 											bool pedirContrasena=false; //variable para controlar si pedimos contraseña o no
 											char usuario[20];
 											int tamBuffer=strlen(buffer);
 
-
-											bzero(usuario, sizeof(usuario));
-
 											std::string lineaFichero, busquedaUsuario;
 
-
+											bzero(usuario, sizeof(usuario));
 											strncpy(usuario, buffer+8, tamBuffer-9);//Metemos en usuario la cadena que va desde la posicion buffer+8
 																								//hasta (tam_buffer-9) posiciones a la derecha
-											std::cout << "\n" << "Impresion valor usuario: " << usuario << '\n';
+											//std::cout << "\n" << "Impresion valor usuario: " << usuario << '\n';
+											bool var=false;
+
+											//CONTROL MISMO USUARIO NO PUEDA LOGUEARSE 2 VECES
+											for (size_t z = 0; z < usuarios.size(); z++) {
+												if (strcmp(usuarios[z].c_str(), usuario) == 0) {
+													bzero(buffer,sizeof(buffer));
+													strcpy(buffer,"-ERR. Este usuario ya se encuentra logueado en el sistema, no puede inicar sesión\0");
+													send(i,buffer,strlen(buffer),0);
+													//break;//ERROR A SOLUCIONAR -> ESTE BREAK NO FUNCIONA
+													var=true;
+												}
+											}
+
+											if(var == true){
+												break;
+											}
+
 											file.open("usuarios.txt", std::fstream::in);
 
 											//Buscamos el usuario introducido por cliente en la base de datos
@@ -349,7 +365,7 @@ int main ( )
 
 											  busquedaUsuario=lineaFichero.substr(0, (strlen(strstr(lineaFichero.c_str(), " ")) - 1));
 
-											  std::cout << "Impresion valor busquedaUsuario: " << busquedaUsuario << '\n';
+											  //std::cout << "Impresion valor busquedaUsuario: " << busquedaUsuario << '\n';
 
 											  if(strcmp(busquedaUsuario.c_str(), usuario)==0){ //vamos comparando cada usuario del archivo con el introducido
 											     pedirContrasena=true;
@@ -437,7 +453,6 @@ int main ( )
 										else if(strcmp(buffer, "INICIAR-PARTIDA\n")==0){
 
 		                           if(FD_ISSET(i, &usuario_validado)){//Comprobamos si el usuario esta validado para dejar entrar en una partida o no
-
 												bzero(buffer,sizeof(buffer));
 		                              strcpy(buffer,"Usuario validado ha entrado en una partida\0");
 		                              send(i,buffer,strlen(buffer),0);
