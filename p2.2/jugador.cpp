@@ -137,7 +137,7 @@ Ficha Jugador::masAlta(){
 bool Jugador::puedePoner(Partida *p){
 	if(p->tableroVacio()) return true;
 	for(int i = 0; i < mano_.size(); i++){
-		if((p->getExtI() == mano_[i].getND()) || (p->getExtD() == mano_[i].getNI())) return true;
+		if((p->getExtI() == mano_[i].getNI()) || (p->getExtI() == mano_[i].getND()) || (p->getExtD() == mano_[i].getNI()) || (p->getExtD() == mano_[i].getND())) return true;
 	}
 	return false;
 };
@@ -175,6 +175,17 @@ void Jugador::robarFicha(Ficha a){
 	mano_.push_back(a);
 };
 
+void Jugador::girarFicha(Ficha a){
+	int aux;
+	for(int i = 0; i < mano_.size(); i++){
+		if((mano_[i].getNI() == a.getNI()) && (mano_[i].getND() == a.getND())){
+			aux = mano_[i].getNI();
+			mano_[i].setNI(mano_[i].getND());
+			mano_[i].setND(aux);
+		}
+	}
+};
+
 void Jugador::colocarFicha(Partida *p){
 	int n;
 	bool colocada = false;
@@ -197,7 +208,12 @@ void Jugador::colocarFicha(Partida *p){
 		cout << "\n[1] Izquierda    [2] Derecha: ";
 		cin >> n;
 		if(n == 1){
-			if(p->getExtI() == a.getND()){
+			if(p->getExtI() == a.getNI()){
+				girarFicha(a);
+				p->anadirFichaTablero(a, n);
+				colocada = true;
+			}
+			else if(p->getExtI() == a.getND()){
 				p->anadirFichaTablero(a, n);
 				colocada = true;
 			}
@@ -205,6 +221,11 @@ void Jugador::colocarFicha(Partida *p){
 		}
 		else if(n == 2){
 			if(p->getExtD() == a.getNI()){
+				p->anadirFichaTablero(a, n);
+				colocada = true;
+			}
+			else if(p->getExtD() == a.getND()){
+				girarFicha(a);
 				p->anadirFichaTablero(a, n);
 				colocada = true;
 			}
