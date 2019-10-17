@@ -57,6 +57,7 @@ class Jugador{
 		void robarFicha(Ficha a);
 		void colocarFicha(Partida *p);
 		void salirPartida(Partida *p);
+		void girarFicha(Ficha a);
 
 };
 
