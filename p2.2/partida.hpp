@@ -20,6 +20,7 @@ class Partida{
     vector <Ficha> tablero_;
     vector <Jugador> jugadores_; //Para indicar el orden de juego
     vector <Ficha> fDobles_; //Para las fichas dobles al iniciar la partida
+		vector <Ficha> fMayores_; //Para las fichas mayores al iniciar partida si no hubiera dobles
 
   public:
     //Constructores

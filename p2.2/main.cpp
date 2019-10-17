@@ -13,14 +13,15 @@ int Menu(){
 	return opt;
 }
 
-int MenuPartida(int pos){
+int MenuPartida(int turno){
 	int opt;
-	cout << "\n\n	JUGADOR " << pos << "\n\n";
+	cout << "\n\n	JUGADOR " << turno << "\n\n";
 	cout << "	[0] SALIR\n";
 	cout << "	[1] Ver Tablero\n";
 	cout << "	[2] Ver Mano\n";
 	cout << "	[3] Colocar ficha\n";
-	cout << "	[4] Robar\n\n";
+	cout << "	[4] Robar\n";
+	cout << "	[5] Pasar turno\n\n";
 	cout << "	Opción: ";
 	cin >> opt;
 	cout << endl << endl;
@@ -33,7 +34,7 @@ int main(){
 	vector <Partida> partida;
 	Partida p(1); //ID a 1 en prueba
 	partida.push_back(p);
-	int id, pos;
+	int id, turno;
 	//cout << "N Jugadores: " << p.getNJugadores() << endl;
 	Ficha a;
 	Jugador j0(0,"irene", "1234", &p);
@@ -48,12 +49,12 @@ int main(){
 	cout << "Jugador 1:\n";
 	j1.mostrarMano();
 	cout << endl;
-	Jugador j2(2,"paco", "1234", &p);
+/*	Jugador j2(2,"paco", "1234", &p);
 	id = p.nuevoJugador(&j2);
 	//j2.setID(id);
 	cout << "Jugador 2:\n";
 	j2.mostrarMano();
-	cout << endl;
+	cout << endl;*/
 	int opt;
 
 
@@ -66,21 +67,24 @@ int main(){
 				break;
 
 			case 1:
-				cout << "Bienvenido a la partida.\n";
-				pos = p.iniciarPartida();
-				//cout << "JUGADOR: " << pos << endl;
+				cout << "	Bienvenidos a la partida.\n";
+				turno = p.iniciarPartida();
+				//cout << "\n	PUNTOS JUGADOR 0: " << j0.getPuntos() << endl;
+				//cout << "	PUNTOS JUGADOR 1: " << j1.getPuntos() << endl << endl;
+
+				//cout << "JUGADOR: " << turno << endl;
 				//fflush(stdout);
-				if(pos == j0.getID()){ cout << "Comienza el jugador 0.\n\n";}
-				else if(pos == j1.getID()){ cout << "Comienza el jugador 1.\n\n";}
-				else if(pos == j2.getID()){ cout << "Comienza el jugador 2.\n\n";}
+				if(turno == j0.getID()){ cout << "	Comienza el jugador 0.\n\n";}
+				else if(turno == j1.getID()){ cout << "	Comienza el jugador 1.\n\n";}
+			//	else if(turno == j2.getID()){ cout << "Comienza el jugador 2.\n\n";}
 				//cout << "N Jugadores: " << p.getNJugadores() << endl;
 				do{
-					opt = MenuPartida(pos);
+					opt = MenuPartida(turno);
 					switch(opt){
 						case 0:
-							if(pos == j0.getID()) j0.salirPartida(&p);
-							else if(pos == j1.getID()) j1.salirPartida(&p);
-							else if(pos == j2.getID()) j2.salirPartida(&p);
+							if(turno == j0.getID()) j0.salirPartida(&p);
+							else if(turno == j1.getID()) j1.salirPartida(&p);
+						//	else if(turno == j2.getID()) j2.salirPartida(&p);
 							cout << "	Has salido de la partida\n";
 							break;
 
@@ -89,43 +93,98 @@ int main(){
 							break;
 
 						case 2:
-							if(pos == j0.getID()) j0.mostrarMano();
-							else if(pos == j1.getID()) j1.mostrarMano();
-							else if(pos == j2.getID()) j2.mostrarMano();
+							if(turno == j0.getID()) j0.mostrarMano();
+							else if(turno == j1.getID()) j1.mostrarMano();
+						//	else if(turno == j2.getID()) j2.mostrarMano();
 							//j0.mostrarMano();
 							break;
 
 						case 3:
-							if(pos == j0.getID()) j0.colocarFicha(&p);
-							else if(pos == j1.getID()) j1.colocarFicha(&p);
-							else if(pos == j2.getID()) j2.colocarFicha(&p);
+							if(turno == j0.getID()){
+								j0.colocarFicha(&p);
+								turno = 1;
+							}
+							else if(turno == j1.getID()){
+								j1.colocarFicha(&p);
+								turno = 0;
+							}
+						//	else if(turno == j2.getID()) j2.colocarFicha(&p);
 							//j0.colocarFicha(&p);
 							break;
 
 						case 4:
-							if(p.montonVacio()) cout << "No quedan fichas en el montón para robar.\n\n";
-							else{
-								if(!j0.puedePoner(&p)){
-									a = p.robar();
-									if(pos == j0.getID()) j0.robarFicha(a);
-									else if(pos == j1.getID()) j1.robarFicha(a);
-									else if(pos == j2.getID()) j2.robarFicha(a);
-									//j0.robarFicha(a);
-									cout << "Has robado la ficha |" <<	a.getNI() << "|" << a.getND() << "| del montón.\n\n";
-									cout << "Tu mano queda:\n\n";
-									if(pos == j0.getID()) j0.mostrarMano();
-									else if(pos == j1.getID()) j1.mostrarMano();
-									else if(pos == j2.getID()) j2.mostrarMano();
-									//j0.mostrarMano();
+								if(turno == j0.getID()){
+									if(!j0.puedePoner(&p)){
+										if(p.montonVacio()){
+											cout << "	No quedan fichas ni puede poner. Pase turno.\n\n";
+										}
+										else{
+											a = p.robar();
+											j0.robarFicha(a);
+											cout << "	Has robado la ficha |" <<	a.getNI() << "|" << a.getND() << "| del montón.\n\n";
+											cout << "	Tu mano queda:\n\n";
+											j0.mostrarMano();
+										}
+									}
+									else{
+										cout << "	No hace falta robar.\n\n";
+									}
 								}
-								else{
-									cout << "No hace falta robar.\n\n";
+								else if(turno == j1.getID()){
+									if(!j1.puedePoner(&p)){
+										if(p.montonVacio()){
+											cout << "	No quedan fichas ni puede poner. Pase turno.\n\n";
+										}
+										else{
+											a = p.robar();
+											j1.robarFicha(a);
+											cout << "	Has robado la ficha |" <<	a.getNI() << "|" << a.getND() << "| del montón.\n\n";
+											cout << "	Tu mano queda:\n\n";
+											j1.mostrarMano();
+										}
+									}
+									else{
+										cout << "	No hace falta robar.\n\n";
+									}
 								}
-							}
+
 							break;
+
+							case 5:
+								if(turno == 0) turno = 1;
+								else if(turno == 1) turno = 0;
+								cout << "	Ha pasado turno.\n";
+								break;
 
 						default:
 							cout << "	Esa opción no existe.\n";
+					}
+
+					/* Si alguno ha colocado todas sus fichas, se termina la partida y gana. */
+					if(j0.nFichas() == 0){
+						cout << "\n\n	SE ACABÓ LA PARTIDA.\n	HA GANADO EL JUGADOR 0.\n\n";// CON " << j1.getPuntos() << " PUNTOS.\n\n";
+						opt = 0;
+					}
+					else if(j1.nFichas() == 0){
+						cout << "\n\n	SE ACABÓ LA PARTIDA.\n	HA GANADO EL JUGADOR 1.\n\n";// CON " << j0.getPuntos() << " PUNTOS.\n\n";
+						opt = 0;
+					}
+
+					/* Si el montón está vacío y nadie puede poner ficha, se termina la Partida
+					   y gana el que menos puntos tuviera. */
+					if((p.montonVacio()) && (!j0.puedePoner(&p)) && (!j1.puedePoner(&p))){
+						if(j0.getPuntos() < j1.getPuntos()){
+							cout << "\n\n	SE ACABÓ LA PARTIDA.\n	HA GANADO EL JUGADOR 0.\n\n";// CON " << j0.getPuntos() << " PUNTOS.\n\n";
+							opt = 0;
+						}
+						else if(j1.getPuntos() < j0.getPuntos()){
+							cout << "\n\n	SE ACABÓ LA PARTIDA.\n	HA GANADO EL JUGADOR 1.\n\n";// CON " << j1.getPuntos() << " PUNTOS.\n\n";
+							opt = 0;
+						}
+						else if(j0.getPuntos() == j1.getPuntos()){
+							cout << "\n\n	SE ACABÓ LA PARTIDA.\n	EMPATE.\n\n";// ENTRE JUGADOR 0 (" << j0.getPuntos() << " puntos) y JUGADOR 1 (" << j1.getPuntos() << " puntos).\n\n";
+							opt = 0;
+						}
 					}
 				}while(opt != 0);
 				break;

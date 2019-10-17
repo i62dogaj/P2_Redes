@@ -20,6 +20,7 @@ class Jugador{
 		vector <Ficha> mano_;
 		vector <Ficha> dobles_;
 		int idPartida_;
+		int puntos_;
 
 	public:
 		//Constructor
@@ -32,13 +33,16 @@ class Jugador{
 		string getPass();
 		int getConectado();
 		int getIDPartida();
+		int getPuntos();
 		vector<Ficha> getMano();
 		int nDobles();
+		int nFichas();
 		void mostrarMano();
 		bool existeFicha(Ficha a);
 		int buscarFicha(Ficha a);
 		bool tieneDobles();
 	  Ficha dobleMasAlta();
+		Ficha masAlta();
 		bool puedePoner(Partida *p);
 
 
@@ -48,6 +52,7 @@ class Jugador{
 		void setPass(string pass);
 		void setConectado(int flag);
 		void setIDPartida(int id);
+		void setPuntos(int puntos);
 		void setManoInicial(vector <Ficha> vec);
 		void robarFicha(Ficha a);
 		void colocarFicha(Partida *p);
