@@ -55,13 +55,13 @@ int main(){
 	cout << "Jugador 2:\n";
 	j2.mostrarMano();
 	cout << endl;*/
-	int opt;
+	int opcion, opt;
 
 
 
 	do{
-		opt = Menu();
-		switch(opt){
+		opcion = Menu();
+		switch(opcion){
 			case 0:
 				cout << "	Has salido del juego.\n";
 				break;
@@ -100,14 +100,12 @@ int main(){
 							break;
 
 						case 3:
-							if(turno == j0.getID()){
-								j0.colocarFicha(&p);
-								turno = 1;
-							}
-							else if(turno == j1.getID()){
-								j1.colocarFicha(&p);
-								turno = 0;
-							}
+						if(turno == j0.getID()){
+							if(j0.colocarFicha(&p)) turno = 1;
+						}
+						else if(turno == j1.getID()){
+							if(j1.colocarFicha(&p)) turno = 0;
+						}
 						//	else if(turno == j2.getID()) j2.colocarFicha(&p);
 							//j0.colocarFicha(&p);
 							break;
@@ -151,9 +149,24 @@ int main(){
 							break;
 
 							case 5:
-								if(turno == 0) turno = 1;
-								else if(turno == 1) turno = 0;
-								cout << "	Ha pasado turno.\n";
+							if(turno == 0){
+								if((j0.puedePoner(&p)) || (!p.montonVacio())){
+									cout << "	No puede pasar turno mientras pueda poner fichas o robar.\n";
+								}
+								else if((!j0.puedePoner(&p)) && (p.montonVacio())){
+									turno = 1;
+									cout << "	Ha pasado turno.\n";
+								}
+							}
+							else if(turno == 1){
+								if((j1.puedePoner(&p)) || (!p.montonVacio())){
+									cout << "	No puede pasar turno mientras pueda poner fichas o robar.\n";
+								}
+								else if((!j1.puedePoner(&p)) && (p.montonVacio())){
+									turno = 0;
+									cout << "	Ha pasado turno.\n";
+								}
+							}
 								break;
 
 						default:
@@ -161,12 +174,12 @@ int main(){
 					}
 
 					/* Si alguno ha colocado todas sus fichas, se termina la partida y gana. */
-					if(j0.nFichas() == 0){
-						cout << "\n\n	SE ACABÓ LA PARTIDA.\n	HA GANADO EL JUGADOR 0.\n\n";// CON " << j1.getPuntos() << " PUNTOS.\n\n";
+					if((j0.nFichas() == 0) && (opt != 0)){
+						cout << "\n\n	SE ACABÓ LA PARTIDA.\n	HA GANADO EL JUGADOR 0 (sin fichas).\n\n";// CON " << j1.getPuntos() << " PUNTOS.\n\n";
 						opt = 0;
 					}
-					else if(j1.nFichas() == 0){
-						cout << "\n\n	SE ACABÓ LA PARTIDA.\n	HA GANADO EL JUGADOR 1.\n\n";// CON " << j0.getPuntos() << " PUNTOS.\n\n";
+					else if((j1.nFichas() == 0) && (opt != 0)){
+						cout << "\n\n	SE ACABÓ LA PARTIDA.\n	HA GANADO EL JUGADOR 1 (sin fichas).\n\n";// CON " << j0.getPuntos() << " PUNTOS.\n\n";
 						opt = 0;
 					}
 
@@ -193,7 +206,7 @@ int main(){
 				cout << "	Esa opción no existe.\n";
 		}
 
-	}while(opt != 0);
+	}while(opcion != 0);
 
 
 
