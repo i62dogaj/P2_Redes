@@ -55,9 +55,9 @@ class Jugador{
 		void setPuntos(int puntos);
 		void setManoInicial(vector <Ficha> vec);
 		void robarFicha(Ficha a);
-		void colocarFicha(Partida *p);
+		bool colocarFicha(Partida *p);
 		void salirPartida(Partida *p);
-		void girarFicha(Ficha a);
+		void girarFicha(Ficha *a);
 
 };
 

@@ -175,19 +175,15 @@ void Jugador::robarFicha(Ficha a){
 	mano_.push_back(a);
 };
 
-void Jugador::girarFicha(Ficha a){
+void Jugador::girarFicha(Ficha *a){
 	int aux;
-	for(int i = 0; i < mano_.size(); i++){
-		if((mano_[i].getNI() == a.getNI()) && (mano_[i].getND() == a.getND())){
-			aux = mano_[i].getNI();
-			mano_[i].setNI(mano_[i].getND());
-			mano_[i].setND(aux);
-		}
-	}
+	aux = a->getNI();
+	a->setNI(a->getND());
+	a->setND(aux);
 };
 
-void Jugador::colocarFicha(Partida *p){
-	int n;
+bool Jugador::colocarFicha(Partida *p){
+	int n, pos;
 	bool colocada = false;
 	Ficha a;
 	do{ // ------ Escogemos la ficha ------
@@ -199,6 +195,7 @@ void Jugador::colocarFicha(Partida *p){
 		a.setND(n);
 		if(!existeFicha(a)) cout << "\nEsa ficha no existe en tu montón. \nIntroduce una que sí tengas.\n\n";
 	}while(!existeFicha(a));
+	pos = buscarFicha(a);
 	// ------ Escogemos el extremo y la colocamos ------
 	if(p->tableroVacio()){
 		p->anadirFichaTablero(a, 1); //No importa el lugar, se inserta sin más
@@ -208,33 +205,37 @@ void Jugador::colocarFicha(Partida *p){
 		cout << "\n[1] Izquierda    [2] Derecha: ";
 		cin >> n;
 		if(n == 1){
-			if(p->getExtI() == a.getNI()){
-				girarFicha(a);
-				p->anadirFichaTablero(a, n);
+			if(p->getExtI() == mano_[pos].getNI()){
+				girarFicha(&mano_[pos]);
+				p->anadirFichaTablero(mano_[pos], n);
 				colocada = true;
 			}
-			else if(p->getExtI() == a.getND()){
-				p->anadirFichaTablero(a, n);
+			else if(p->getExtI() == mano_[pos].getND()){
+				p->anadirFichaTablero(mano_[pos], n);
 				colocada = true;
 			}
 			else cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
 		}
 		else if(n == 2){
-			if(p->getExtD() == a.getNI()){
-				p->anadirFichaTablero(a, n);
+			if(p->getExtD() == mano_[pos].getNI()){
+				p->anadirFichaTablero(mano_[pos], n);
 				colocada = true;
 			}
-			else if(p->getExtD() == a.getND()){
-				girarFicha(a);
-				p->anadirFichaTablero(a, n);
+			else if(p->getExtD() == mano_[pos].getND()){
+				girarFicha(&mano_[pos]);
+				p->anadirFichaTablero(mano_[pos], n);
 				colocada = true;
 			}
 			else cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
 		}
 	}
 	// ------ Eliminamos la ficha de la mano ------
-	if(colocada) mano_.erase(mano_.begin()+(buscarFicha(a)));
-	p->mostrarTablero();
+	if(colocada){
+		mano_.erase(mano_.begin()+pos);
+		p->mostrarTablero();
+		return true;
+	}
+	else return false;
 };
 
 
