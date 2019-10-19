@@ -92,8 +92,12 @@ bool Jugador::tieneDobles(){
 			//mano_[i].mostrarFicha();
 		}
 	}
-	if(nDobles() > 0) return true;
-	else return false;
+	if(nDobles() > 0){
+		return true;
+	}
+	else{
+		return false;
+	}
 };
 
 Ficha Jugador::dobleMasAlta(){
@@ -101,8 +105,8 @@ Ficha Jugador::dobleMasAlta(){
 	//mayor = dobles_[0]
   mayor.setNI(dobles_[0].getNI());
   mayor.setND(dobles_[0].getND());
-	if(dobles_.size() > 1){
-	  for(int i = 0; i < dobles_.size(); i++){
+	if(nDobles() > 1){
+	  for(int i = 0; i < nDobles(); i++){
 	    //Basta con comprobar uno de los valores
 	    if(mayor.getNI() < dobles_[i].getNI()){
 	      //mayor = dobles_[i]
@@ -112,7 +116,7 @@ Ficha Jugador::dobleMasAlta(){
 	  }
 	}
 	//cout << "Jugador " << getID() << "-> Ficha doble mayor: " << endl;
-	fflush(stdout);
+	//fflush(stdout);
 	//mayor.mostrarFicha();
 	return mayor;
 };
@@ -196,15 +200,20 @@ bool Jugador::colocarFicha(Partida *p){
 		if(!existeFicha(a)) cout << "\nEsa ficha no existe en tu montón. \nIntroduce una que sí tengas.\n\n";
 	}while(!existeFicha(a));
 	pos = buscarFicha(a);
-	// ------ Escogemos el extremo y la colocamos ------
+	// ------ Comprobamos que la primera que ponga, si sale él, sea la doble mayor -----
 	if(p->tableroVacio()){
-		p->anadirFichaTablero(a, 1); //No importa el lugar, se inserta sin más
-		colocada = true;
+		if((mano_[pos].getNI() != p->getMasAlta().getNI()) && (mano_[pos].getND() != p->getMasAlta().getND())){
+			cout << "\nPara empezar la partida debe colocar su ficha doble más alta.\n";
+		}
+		else{
+			p->anadirFichaTablero(mano_[pos], 1); //No importa el lugar, se inserta sin más
+			colocada = true;
+		}
 	}
-	else{
+	else{ // ------ Escogemos el extremo y la colocamos ------
 		cout << "\n[1] Izquierda    [2] Derecha: ";
 		cin >> n;
-		if(n == 1){
+		if(n == 1){ //Comprobamos los números de los extremos y giramos si hace falta
 			if(p->getExtI() == mano_[pos].getNI()){
 				girarFicha(&mano_[pos]);
 				p->anadirFichaTablero(mano_[pos], n);

@@ -28,8 +28,12 @@ class Ficha{
 			cout << " |" << getNI() << "|" << getND() << "|" << endl;
 		};
 		inline bool esDoble(){
-			if(getNI() == getND()) return true;
-			else return false;
+			if(getNI() == getND()){
+				return true;
+			}
+			else{
+				return false;
+			}
 		};
 
 		//MODIFICADORES
