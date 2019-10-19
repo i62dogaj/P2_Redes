@@ -470,7 +470,7 @@ int main ( )
 
 															int socket1=partidas[z].getSocket1();
 
-															partidas.back().setSocket2(i);
+															partidas[z].setSocket2(i);
 															int socket2=partidas[z].getSocket2();
 
 
@@ -484,11 +484,11 @@ int main ( )
 															send(socket1 ,buffer,strlen(buffer),0);
 
 															Jugador j1(socket1, &partidas[z]);
-															partidas.back().nuevoJugador(&j1);
+															partidas[z].nuevoJugador(&j1);
 
 
 															Jugador j2(socket2, &partidas[z]);
-															partidas.back().nuevoJugador(&j2);
+															partidas[z].nuevoJugador(&j2);
 
 
 															bzero(buffer,sizeof(buffer));
@@ -574,8 +574,13 @@ int main ( )
 											//Para poder cambiar el tablero que le corresponde y no otro
 
 		                           if(FD_ISSET(i, &usuario_jugando)){
-
-												partidas[z].
+																 int idPartida;
+																 for(int z = 0; z < partidas.size(); z++){
+																	 if((partidas[z].getSocket1() == i) || (partidas[z].getSocket2() == i)){
+																		 idPartida = z;
+																	 }
+																 }
+																 partidas[idPartida].getJugador(i).colocarFicha(&partidas[idPartida]);
 
 
 		                           }
@@ -584,7 +589,7 @@ int main ( )
 		                              strcpy(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede introducir ficha\0");
 		                              send(i,buffer,strlen(buffer),0);
 		                           }
-		                        }
+		               }
 
 
 
