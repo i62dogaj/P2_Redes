@@ -42,8 +42,8 @@ class Partida{
     bool tableroVacio();
     bool montonVacio();
     bool buscarFichaMonton(Ficha a);
-    void mostrarMonton();
-    void mostrarTablero();
+    string mostrarMonton();
+    string mostrarTablero();
 
     int getSocket1();
     int getSocket2();

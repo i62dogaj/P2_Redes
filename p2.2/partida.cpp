@@ -173,22 +173,50 @@ bool Partida::buscarFichaMonton(Ficha a){
 	return false;
 };
 
-void Partida::mostrarMonton(){
-	for(int i = 0; i < monton_.size(); i++){
-		cout << " |" << monton_[i].getNI() << "|" << monton_[i].getND() << "|" << endl;
-	}
-  cout << endl;
+string Partida::mostrarMonton(){
+  char cad[250], I[10], D[10];
+  if(montonVacio()){
+    //cout << "Aún no hay fichas en el tablero.\n";
+    strcpy (cad,"\nMONTÓN ");
+  }
+  else{
+    strcpy (cad,"\nMONTÓN |");
+    for(int i = 0; i < monton_.size(); i++){
+  		sprintf(I, "%d", monton_[i].getNI());
+  		sprintf(D, "%d", monton_[i].getND());
+  		strcat (cad,I);
+  		strcat (cad,"|");
+  		strcat (cad,D);
+  		if(i == monton_.size()-1) strcat (cad,"|");
+  		else strcat (cad,"||");
+  		//cout << " |" << monton_[i].getNI() << "|" << monton_[i].getND() << "|";
+  	}
+  }
+  string cadena(cad);
+  return cadena;
 };
 
-void Partida::mostrarTablero(){
-  if(tableroVacio()) cout << "Aún no hay fichas en el tablero.\n";
-  else{
-    cout << "\n TABLERO: \n\n ";
-		for(int i = 0; i < tablero_.size(); i++){
-			cout << "|" << tablero_[i].getNI() << "|" << tablero_[i].getND() << "|";
-		}
-    cout << endl;
+string Partida::mostrarTablero(){
+  char cad[250], I[10], D[10];
+  if(tableroVacio()){
+    //cout << "Aún no hay fichas en el tablero.\n";
+    strcpy (cad,"\nTABLERO ");
   }
+  else{
+    strcpy (cad,"\nTABLERO |");
+    for(int i = 0; i < tablero_.size(); i++){
+  		sprintf(I, "%d", tablero_[i].getNI());
+  		sprintf(D, "%d", tablero_[i].getND());
+  		strcat (cad,I);
+  		strcat (cad,"|");
+  		strcat (cad,D);
+  		if(i == tablero_.size()-1) strcat (cad,"|");
+  		else strcat (cad,"||");
+  		//cout << " |" << tablero_[i].getNI() << "|" << tablero_[i].getND() << "|";
+  	}
+  }
+  string cadena(cad);
+  return cadena;
 };
 
 void Partida::setIDPartida(int id){

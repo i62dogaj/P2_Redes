@@ -100,7 +100,8 @@ int main(){
 							break;
 
 						case 1:
-							p.mostrarTablero();
+							buffer = p.mostrarTablero();
+							cout << buffer << endl;
 							break;
 
 						case 2:
