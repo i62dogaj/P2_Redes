@@ -4,7 +4,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <vector>
-#include <string>
+#include <string.h>
 #include "ficha.hpp"
 using namespace std;
 
@@ -37,7 +37,7 @@ class Jugador{
 		vector<Ficha> getMano();
 		int nDobles();
 		int nFichas();
-		void mostrarMano();
+		string mostrarMano();
 		bool existeFicha(Ficha a);
 		int buscarFicha(Ficha a);
 		bool tieneDobles();

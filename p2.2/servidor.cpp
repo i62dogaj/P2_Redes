@@ -476,6 +476,14 @@ int main ( )
 																		Jugador j1(partidas.back().getSocket1(), &partidas.back());
 																		Jugador j2(partidas.back().getSocket2(), &partidas.back());
 
+																		bzero(buffer,sizeof(buffer));
+																		strcpy(buffer, j1.mostrarMano().c_str());
+																		send(partidas.back().getSocket1(),buffer,strlen(buffer),0);
+																		
+																		bzero(buffer,sizeof(buffer));
+																		strcpy(buffer, j2.mostrarMano().c_str());
+																		send(partidas.back().getSocket2(),buffer,strlen(buffer),0);
+
 																	}
 																	else{
 																		//crear nuevo Panel

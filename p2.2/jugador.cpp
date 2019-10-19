@@ -60,11 +60,22 @@ int Jugador::nFichas(){
 	return mano_.size();
 };
 
-void Jugador::mostrarMano(){
+string Jugador::mostrarMano(){
+	char cad[250], I[10], D[10];
+
+	strcpy (cad,"\nFICHAS |");
 	for(int i = 0; i < mano_.size(); i++){
-		cout << " |" << mano_[i].getNI() << "|" << mano_[i].getND() << "|";
+		sprintf(I, "%d", mano_[i].getNI());
+		sprintf(D, "%d", mano_[i].getND());
+		strcat (cad,I);
+		strcat (cad,"|");
+		strcat (cad,D);
+		if(i == mano_.size()-1) strcat (cad,"|");
+		else strcat (cad,"||");
+		//cout << " |" << mano_[i].getNI() << "|" << mano_[i].getND() << "|";
 	}
-	cout << endl;
+	string cadena(cad);
+	return cadena;
 };
 
 bool Jugador::existeFicha(Ficha a){
