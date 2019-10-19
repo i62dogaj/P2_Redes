@@ -29,11 +29,11 @@ class Partida{
 
   public:
     //Constructores
-    Partida(int id);
+    Partida();
 
     //OBSERVADORES
     int getIDPartida();
-	 int getIDJugador(string login);
+	  int getIDJugador(string login);
     int getNJugadores();
     int getExtI();
     int getExtD();
@@ -54,7 +54,7 @@ class Partida{
     void setNJugadores(int n);
     void masNJugadores();
     void menosNJugadores();
-    int nuevoJugador(Jugador *j);
+    void nuevoJugador(Jugador *j);
 		vector<Ficha> repartir();
 		Ficha robar();
     void anadirFichaTablero(Ficha a, int lugar);

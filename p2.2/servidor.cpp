@@ -454,50 +454,50 @@ int main ( )
 										else if(strcmp(buffer, "INICIAR-PARTIDA\n")==0){
 
 		                           if(FD_ISSET(i, &usuario_validado)){//Comprobamos si el usuario esta validado para dejar entrar en una partida o no
-												//bzero(buffer,sizeof(buffer));
-		                              //strcpy(buffer,"Usuario validado ha entrado en una partida\0");
-		                              //send(i,buffer,strlen(buffer),0);
+																//bzero(buffer,sizeof(buffer));
+	                              //strcpy(buffer,"Usuario validado ha entrado en una partida\0");
+	                              //send(i,buffer,strlen(buffer),0);
 
-												if(partidas.size()>0){
-													if(partidas.back().getSocket2()==-1){
-														int socket1=partidas.back().getSocket1();
+																if(partidas.size()>0){
+																	if(partidas.back().getSocket2()==-1){
+																		int socket1=partidas.back().getSocket1();
 
-														partidas.back().setSocket2(i);
-														partidas.back().setTurno(socket1);
+																		partidas.back().setSocket2(i);
+																		partidas.back().setTurno(socket1);
 
-														FD_CLR(socket1, &usuario_esperandoPartida);
-														FD_SET(socket1, &usuario_jugando);
-														FD_SET(i, &usuario_jugando);
+																		FD_CLR(socket1, &usuario_esperandoPartida);
+																		FD_SET(socket1, &usuario_jugando);
+																		FD_SET(i, &usuario_jugando);
 
-														bzero(buffer,sizeof(buffer));
-														strcpy(buffer,"+OK Comienza la partida.\0");
-														send(i, buffer, strlen(buffer), 0);
-														send(socket1 ,buffer,strlen(buffer),0);
+																		bzero(buffer,sizeof(buffer));
+																		strcpy(buffer,"+OK Comienza la partida.\0");
+																		send(i, buffer, strlen(buffer), 0);
+																		send(socket1 ,buffer,strlen(buffer),0);
 
-													}
-													else{
-														//crear nuevo Panel
-														Partida nuevo;
-														nuevo.setSocket1(i);
-														FD_SET(i, &usuario_esperandoPartida);
-														partidas.push_back(nuevo);
+																	}
+																	else{
+																		//crear nuevo Panel
+																		Partida nuevo;
+																		nuevo.setSocket1(i);
+																		FD_SET(i, &usuario_esperandoPartida);
+																		partidas.push_back(nuevo);
 
-														bzero(buffer,sizeof(buffer));
-														strcpy(buffer,"+OK Waiting for a player\0");
-														send(i,buffer,strlen(buffer),0);
-													}
-												}
-												else{
-													//inicializar el vector
-													Partida nuevo;
-													nuevo.setSocket1(i);
-													FD_SET(i, &usuario_esperandoPartida);
-													partidas.push_back(nuevo);
+																		bzero(buffer,sizeof(buffer));
+																		strcpy(buffer,"+OK Waiting for a player\0");
+																		send(i,buffer,strlen(buffer),0);
+																	}
+																}
+																else{
+																	//inicializar el vector
+																	Partida nuevo;
+																	nuevo.setSocket1(i);
+																	FD_SET(i, &usuario_esperandoPartida);
+																	partidas.push_back(nuevo);
 
-													bzero(buffer,sizeof(buffer));
-													strcpy(buffer,"+OK Waiting for a player\0");
-													send(i,buffer,strlen(buffer),0);
-												}
+																	bzero(buffer,sizeof(buffer));
+																	strcpy(buffer,"+OK Waiting for a player\0");
+																	send(i,buffer,strlen(buffer),0);
+																}
 
 
 

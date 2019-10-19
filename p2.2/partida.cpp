@@ -2,8 +2,8 @@
 #include "jugador.hpp"
 using namespace std;
 
-Partida::Partida(int id){ //Asignamos un ID y generamos todas las fichas sin repetirlas
-  setIDPartida(id);
+Partida::Partida(){ //Generamos todas las fichas sin repetirlas
+  //setIDPartida(id);
   setNJugadores(0);
 	int k = 0;
 	for(int i = k; i < 7; i++){
@@ -196,10 +196,9 @@ void Partida::menosNJugadores(){
 	setNJugadores(getNJugadores()-1);
 };
 
-int Partida::nuevoJugador(Jugador *j){
+void Partida::nuevoJugador(Jugador *j){
   jugadores_.push_back(*j);
   masNJugadores();
-	return jugadores_.size();
 };
 
 vector<Ficha> Partida::repartir(){
