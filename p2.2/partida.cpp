@@ -65,9 +65,9 @@ Ficha Partida::getMasAlta(){
    los jugadores comprobarán si la tienen y comenzará el que
    la tenga. */
 Ficha Partida::iniciarPartida(){
-  Ficha fichaAux;
-  int pos, sumaMayor, aux;
+  int pos, sumaMayor, aux, k = 0;
 	bool hayDobles = false;
+  vector <Ficha> vec;
 	/* Primero comprueba si los jugadores tienen fichas dobles */
   for(int i = 0; i < jugadores_.size(); i++){
     if(jugadores_[i].tieneDobles()){
@@ -81,17 +81,17 @@ Ficha Partida::iniciarPartida(){
 			fflush(stdout);
 			fDobles_[i].mostrarFicha();
 		}*/
-	  //mayor = fDobles_[0]
-	  masAlta_.setNI(fDobles_[0].getNI());
-	  masAlta_.setND(fDobles_[0].getND());
+    masAlta_ = fDobles_[0];
+	 // masAlta_.setNI(fDobles_[0].getNI());
+	  //masAlta_.setND(fDobles_[0].getND());
 	  pos = 0;
 		if(fDobles_.size() > 1){
 		  for(int i = 0; i < fDobles_.size(); i++){
 		    //Basta con comprobar uno de los valores
 		    if(masAlta_.getNI() < fDobles_[i].getNI()){
-		      //masAlta_ = fDobles_[i]
-		      masAlta_.setNI(fDobles_[i].getNI());
-		      masAlta_.setND(fDobles_[i].getND());
+          masAlta_ = fDobles_[i];
+		      //masAlta_.setNI(fDobles_[i].getNI());
+		      //masAlta_.setND(fDobles_[i].getND());
 		      pos = i;
 		    }
 		  }
@@ -100,6 +100,20 @@ Ficha Partida::iniciarPartida(){
 	/* Si ningún jugador tiene fichas dobles, se pasaría a comprobar
 	   la siguiente ficha más alta y comenzará quien la tenga.*/
 	else if(!hayDobles){
+    /*//Creamos un vector con 21 fichas (sin dobles) para comparar
+  	for(int i = k; i < 7; i++){
+  		for(int j = k; j < 7; j++){
+  			Ficha a(i,j);
+  			if(!a.esDoble()) vec.push_back(a);
+  		}
+  		k++;
+  	}
+    cout << "\n Vector sin dobles: \n\n ";
+		for(int i = 0; i < vec.size(); i++){
+			cout << "|" << vec[i].getNI() << "|" << vec[i].getND() << "|";
+		}
+    cout << endl;*/
+
 		for(int i = 0; i < jugadores_.size(); i++){
 				fMayores_.push_back(jugadores_[i].masAlta());
 	  }
@@ -108,17 +122,17 @@ Ficha Partida::iniciarPartida(){
 			fflush(stdout);
 			fMayores_[i].mostrarFicha();
 		}*/
-	  //masAlta_ = fMayores_[0]
-	  masAlta_.setNI(fMayores_[0].getNI());
-	  masAlta_.setND(fMayores_[0].getND());
+    masAlta_ = fMayores_[0];
+	  //masAlta_.setNI(fMayores_[0].getNI());
+	  //masAlta_.setND(fMayores_[0].getND());
 		sumaMayor = fMayores_[0].getNI() + fMayores_[0].getND();
 	  pos = 0;
 	  for(int i = 0; i < fMayores_.size(); i++){
 	    aux = fMayores_[i].getNI() + fMayores_[i].getND();
 	    if(aux > sumaMayor){
-	      //masAlta_ = fMayores_[i]
-	      masAlta_.setNI(fMayores_[i].getNI());
-	      masAlta_.setND(fMayores_[i].getND());
+        masAlta_ = fMayores_[i];
+	      //masAlta_.setNI(fMayores_[i].getNI());
+	      //masAlta_.setND(fMayores_[i].getND());
 				sumaMayor = aux;
 	      pos = i;
 	    }

@@ -102,16 +102,16 @@ bool Jugador::tieneDobles(){
 
 Ficha Jugador::dobleMasAlta(){
 	Ficha mayor;
-	//mayor = dobles_[0]
-  mayor.setNI(dobles_[0].getNI());
-  mayor.setND(dobles_[0].getND());
+	mayor = dobles_[0];
+  //mayor.setNI(dobles_[0].getNI());
+  //mayor.setND(dobles_[0].getND());
 	if(nDobles() > 1){
 	  for(int i = 0; i < nDobles(); i++){
 	    //Basta con comprobar uno de los valores
 	    if(mayor.getNI() < dobles_[i].getNI()){
-	      //mayor = dobles_[i]
-	      mayor.setNI(dobles_[i].getNI());
-	      mayor.setND(dobles_[i].getND());
+				mayor = dobles_[i];
+	      //mayor.setNI(dobles_[i].getNI());
+	      //mayor.setND(dobles_[i].getND());
 	    }
 	  }
 	}
@@ -124,14 +124,16 @@ Ficha Jugador::dobleMasAlta(){
 Ficha Jugador::masAlta(){
 	Ficha mayor;
 	int sumaMayor, aux;
-	mayor.setNI(mano_[0].getNI());
-	mayor.setND(mano_[0].getND());
-	sumaMayor = mano_[0].getNI() + mano_[0].getND();
+	mayor = mano_[0];
+	//mayor.setNI(mano_[0].getNI());
+	//mayor.setND(mano_[0].getND());
+	sumaMayor = mayor.getNI() + mayor.getND();
 	for(int i = 0; i < mano_.size(); i++){
 		aux = mano_[i].getNI() + mano_[i].getND();
 		if(aux > sumaMayor){
-			mayor.setNI(mano_[i].getNI());
-			mayor.setND(mano_[i].getND());
+			mayor = mano_[i];
+			//mayor.setNI(mano_[i].getNI());
+			//mayor.setND(mano_[i].getND());
 			sumaMayor = aux;
 		}
 	}
