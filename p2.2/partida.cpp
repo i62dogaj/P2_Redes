@@ -28,7 +28,7 @@ int Partida::getIDJugador(string login){
 	for(int i = 0; i < jugadores_.size(); i++){
 		if(jugadores_[i].getLogin() == login) return i;
 	}
-	//return 1000;
+   return 100000;
 };
 
 int Partida::getNJugadores(){

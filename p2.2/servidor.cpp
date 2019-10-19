@@ -453,64 +453,110 @@ int main ( )
 										------------------------------------------------------------------------ */
 										else if(strcmp(buffer, "INICIAR-PARTIDA\n")==0){
 
+											bool estado=false;
+
 		                           if(FD_ISSET(i, &usuario_validado)){//Comprobamos si el usuario esta validado para dejar entrar en una partida o no
-																//bzero(buffer,sizeof(buffer));
+											//bzero(buffer,sizeof(buffer));
 	                              //strcpy(buffer,"Usuario validado ha entrado en una partida\0");
 	                              //send(i,buffer,strlen(buffer),0);
 
-																if(partidas.size()>0){
-																	if(partidas.back().getSocket2()==-1){
-																		int socket1=partidas.back().getSocket1();
+												if(partidas.size()>0){
+													for (size_t z = 0; z < partidas.size(); z++) {
+														if((partidas[z].getSocket2() == -1) && (estado == false)){
 
-																		partidas.back().setSocket2(i);
-																		partidas.back().setTurno(socket1);
+															estado=true;
 
-																		FD_CLR(socket1, &usuario_esperandoPartida);
-																		FD_SET(socket1, &usuario_jugando);
-																		FD_SET(i, &usuario_jugando);
+															Ficha a;
 
-																		bzero(buffer,sizeof(buffer));
-																		strcpy(buffer,"+OK Comienza la partida.\0");
-																		send(i, buffer, strlen(buffer), 0);
-																		send(socket1 ,buffer,strlen(buffer),0);
-																		Jugador j1(partidas.back().getSocket1(), &partidas.back());
-																		Jugador j2(partidas.back().getSocket2(), &partidas.back());
+															int socket1=partidas[z].getSocket1();
 
-																		bzero(buffer,sizeof(buffer));
-																		strcpy(buffer, j1.mostrarMano().c_str());
-																		send(partidas.back().getSocket1(),buffer,strlen(buffer),0);
-																		
-																		bzero(buffer,sizeof(buffer));
-																		strcpy(buffer, j2.mostrarMano().c_str());
-																		send(partidas.back().getSocket2(),buffer,strlen(buffer),0);
+															partidas.back().setSocket2(i);
+															int socket2=partidas[z].getSocket2();
 
-																	}
-																	else{
-																		//crear nuevo Panel
-																		Partida nuevo;
-																		nuevo.setSocket1(i);
-																		FD_SET(i, &usuario_esperandoPartida);
-																		partidas.push_back(nuevo);
 
-																		bzero(buffer,sizeof(buffer));
-																		strcpy(buffer,"+OK Waiting for a player\0");
-																		send(i,buffer,strlen(buffer),0);
-																	}
-																}
-																else{
-																	//inicializar el vector
-																	Partida nuevo;
-																	nuevo.setSocket1(i);
-																	FD_SET(i, &usuario_esperandoPartida);
-																	partidas.push_back(nuevo);
+															FD_CLR(socket1, &usuario_esperandoPartida);
+															FD_SET(socket1, &usuario_jugando);
+															FD_SET(i, &usuario_jugando);
 
-																	bzero(buffer,sizeof(buffer));
-																	strcpy(buffer,"+OK Waiting for a player\0");
-																	send(i,buffer,strlen(buffer),0);
-																}
+															bzero(buffer,sizeof(buffer));
+															strcpy(buffer,"+OK. Empienza la partida.\0");
+															send(i, buffer, strlen(buffer), 0);
+															send(socket1 ,buffer,strlen(buffer),0);
+
+															Jugador j1(socket1, &partidas[z]);
+															partidas.back().nuevoJugador(&j1);
+
+
+															Jugador j2(socket2, &partidas[z]);
+															partidas.back().nuevoJugador(&j2);
+
+
+															bzero(buffer,sizeof(buffer));
+															strcpy(buffer, j1.mostrarMano().c_str());
+															send(socket1,buffer,strlen(buffer),0);
+
+															bzero(buffer,sizeof(buffer));
+															strcpy(buffer, j2.mostrarMano().c_str());
+															send(socket2,buffer,strlen(buffer),0);
 
 
 
+
+															a = partidas[z].iniciarPartida();
+
+															if(j1.existeFicha(a)){
+																bzero(buffer,sizeof(buffer));
+																strcpy(buffer,"\0+OK. Turno de partida\0");
+																send(socket1, buffer, strlen(buffer),0);
+
+																bzero(buffer,sizeof(buffer));
+																strcpy(buffer,"\0+OK. Turno del otro jugador\0");
+																send(socket2, buffer, strlen(buffer),0);
+
+
+															}
+															else if(j2.existeFicha(a)){
+																bzero(buffer,sizeof(buffer));
+																strcpy(buffer,"\0+OK. Turno de partida\0");
+																send(socket2 ,buffer,strlen(buffer),0);
+
+																bzero(buffer,sizeof(buffer));
+																strcpy(buffer,"\0+OK. Turno del otro jugador\0");
+																send(socket1 ,buffer,strlen(buffer),0);
+															}
+
+															//Comprobar quien tiene el doble más alto o la ficha mas mas alta
+															//Y decirle a este que es su turno y al otro que espere
+
+														}
+
+													}
+													//FUERA DEL FOR. aqui he recorrido el vector entero
+
+													if ( (estado == false) && (partidas.size() < 10) ) {
+														Partida nuevo;
+														nuevo.setSocket1(i);
+														FD_SET(i, &usuario_esperandoPartida);
+														partidas.push_back(nuevo);
+
+														bzero(buffer,sizeof(buffer));
+														strcpy(buffer,"+Ok. Petición Recibida. Quedamos a la espera de más jugadores\0");
+														send(i,buffer,strlen(buffer),0);
+													}
+
+
+												}
+												else{
+													//inicializar el vector
+													Partida nuevo;
+													nuevo.setSocket1(i);
+													FD_SET(i, &usuario_esperandoPartida);
+													partidas.push_back(nuevo);
+
+													bzero(buffer,sizeof(buffer));
+													strcpy(buffer,"+Ok. Petición Recibida. Quedamos a la espera de más jugadores\0");
+													send(i,buffer,strlen(buffer),0);
+												}
 		                           }
 		                           else{
 		                              bzero(buffer,sizeof(buffer));
@@ -518,6 +564,27 @@ int main ( )
 		                              send(i,buffer,strlen(buffer),0);
 		                           }
 		                        }//CIERRE INICIAR-PARTIDA
+
+										/*-----------------------------------------------------------------------
+										COLOCAR-FICHA
+										------------------------------------------------------------------------ */
+										else if(strcmp(buffer, "COLOCAR-FICHA\n")==0){
+
+											//Tengo que saber en que partida esta el usuario que ha escrito colocar-ficha
+											//Para poder cambiar el tablero que le corresponde y no otro
+
+		                           if(FD_ISSET(i, &usuario_jugando)){
+
+												partidas[z].
+
+
+		                           }
+		                           else{
+		                              bzero(buffer,sizeof(buffer));
+		                              strcpy(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede introducir ficha\0");
+		                              send(i,buffer,strlen(buffer),0);
+		                           }
+		                        }
 
 
 
