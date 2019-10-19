@@ -5,6 +5,8 @@ using namespace std;
 Partida::Partida(){ //Generamos todas las fichas sin repetirlas
   //setIDPartida(id);
   setNJugadores(0);
+  socket1_ = -1;
+  socket2_ = -1;
 	int k = 0;
 	for(int i = k; i < 7; i++){
 		for(int j = k; j < 7; j++){

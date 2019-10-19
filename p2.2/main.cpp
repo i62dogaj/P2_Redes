@@ -37,13 +37,13 @@ int main(){
 	int id, turno;
 	//cout << "N Jugadores: " << p.getNJugadores() << endl;
 	Ficha a;
-	Jugador j0(0,"irene", "1234", &p);
+	Jugador j0(0, &p);
 	p.nuevoJugador(&j0);
 	//j0.setID(id);
 	cout << "Jugador 0:\n";
 	j0.mostrarMano();
 	cout << endl;
-	Jugador j1(1,"pepe", "1234", &p);
+	Jugador j1(1, &p);
 	p.nuevoJugador(&j1);
 	//j1.setID(id);
 	cout << "Jugador 1:\n";
