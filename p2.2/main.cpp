@@ -68,14 +68,23 @@ int main(){
 
 			case 1:
 				cout << "	Bienvenidos a la partida.\n";
-				turno = p.iniciarPartida();
+				a.setNI(p.iniciarPartida().getNI());
+				a.setND(p.iniciarPartida().getND());
+				cout << "Ficha más alta:\n";
+				a.mostrarFicha();
 				//cout << "\n	PUNTOS JUGADOR 0: " << j0.getPuntos() << endl;
 				//cout << "	PUNTOS JUGADOR 1: " << j1.getPuntos() << endl << endl;
 
 				//cout << "JUGADOR: " << turno << endl;
 				//fflush(stdout);
-				if(turno == j0.getID()){ cout << "	Comienza el jugador 0.\n\n";}
-				else if(turno == j1.getID()){ cout << "	Comienza el jugador 1.\n\n";}
+				if(j0.existeFicha(a)){
+					turno = 0;
+					cout << "	Comienza el jugador 0.\n\n";
+				}
+				else if(j1.existeFicha(a)){
+					turno = 1;
+					cout << "	Comienza el jugador 1.\n\n";
+				}
 			//	else if(turno == j2.getID()){ cout << "Comienza el jugador 2.\n\n";}
 				//cout << "N Jugadores: " << p.getNJugadores() << endl;
 				do{

@@ -21,6 +21,7 @@ class Partida{
     vector <Jugador> jugadores_; //Para indicar el orden de juego
     vector <Ficha> fDobles_; //Para las fichas dobles al iniciar la partida
 		vector <Ficha> fMayores_; //Para las fichas mayores al iniciar partida si no hubiera dobles
+    Ficha masAlta_;
 
   public:
     //Constructores
@@ -32,7 +33,8 @@ class Partida{
     int getNJugadores();
     int getExtI();
     int getExtD();
-    int iniciarPartida();
+    Ficha getMasAlta();
+    Ficha iniciarPartida();
     bool tableroVacio();
     bool montonVacio();
     bool buscarFicha(Ficha a);

@@ -41,14 +41,17 @@ int Partida::getExtD(){
 	return (tablero_.back()).getND();
 };
 
+Ficha Partida::getMasAlta(){
+  return masAlta_;
+};
+
 
 /* En el vector fDobles_ se introducirá la mayor ficha doble
-   que tenga cada jugador en el mismo índice que se encuentra en el
-  vector jugadores_. Así, buscamos la mayor de todas y le decimos al
-  jugador correspondiente que tiene la mayor ficha para empezar la
-  partida. */
-int Partida::iniciarPartida(){
-  Ficha mayor, fichaAux;
+   que tenga cada jugador. Así, buscamos la mayor de todas,
+   los jugadores comprobarán si la tienen y comenzará el que
+   la tenga. */
+Ficha Partida::iniciarPartida(){
+  Ficha fichaAux;
   int pos, sumaMayor, aux;
 	bool hayDobles = false;
 	/* Primero comprueba si los jugadores tienen fichas dobles */
@@ -65,25 +68,24 @@ int Partida::iniciarPartida(){
 			fDobles_[i].mostrarFicha();
 		}*/
 	  //mayor = fDobles_[0]
-	  mayor.setNI(fDobles_[0].getNI());
-	  mayor.setND(fDobles_[0].getND());
+	  masAlta_.setNI(fDobles_[0].getNI());
+	  masAlta_.setND(fDobles_[0].getND());
 	  pos = 0;
 		if(fDobles_.size() > 1){
 		  for(int i = 0; i < fDobles_.size(); i++){
 		    //Basta con comprobar uno de los valores
-		    if(mayor.getNI() < fDobles_[i].getNI()){
-		      //mayor = fDobles_[i]
-		      mayor.setNI(fDobles_[i].getNI());
-		      mayor.setND(fDobles_[i].getND());
+		    if(masAlta_.getNI() < fDobles_[i].getNI()){
+		      //masAlta_ = fDobles_[i]
+		      masAlta_.setNI(fDobles_[i].getNI());
+		      masAlta_.setND(fDobles_[i].getND());
 		      pos = i;
 		    }
 		  }
 		}
 	}
 	/* Si ningún jugador tiene fichas dobles, se pasaría a comprobar
-	   la siguiente ficha más alta, ergo aquella cuya suma de los dos
-		 números sea la más alta.*/
-	else{
+	   la siguiente ficha más alta y comenzará quien la tenga.*/
+	else if(!hayDobles){
 		for(int i = 0; i < jugadores_.size(); i++){
 				fMayores_.push_back(jugadores_[i].masAlta());
 	  }
@@ -92,27 +94,25 @@ int Partida::iniciarPartida(){
 			fflush(stdout);
 			fMayores_[i].mostrarFicha();
 		}*/
-	  //mayor = fMayores_[0]
-	  mayor.setNI(fMayores_[0].getNI());
-	  mayor.setND(fMayores_[0].getND());
+	  //masAlta_ = fMayores_[0]
+	  masAlta_.setNI(fMayores_[0].getNI());
+	  masAlta_.setND(fMayores_[0].getND());
 		sumaMayor = fMayores_[0].getNI() + fMayores_[0].getND();
 	  pos = 0;
 	  for(int i = 0; i < fMayores_.size(); i++){
 	    aux = fMayores_[i].getNI() + fMayores_[i].getND();
 	    if(aux > sumaMayor){
-	      //mayor = fMayores_[i]
-	      mayor.setNI(fMayores_[i].getNI());
-	      mayor.setND(fMayores_[i].getND());
+	      //masAlta_ = fMayores_[i]
+	      masAlta_.setNI(fMayores_[i].getNI());
+	      masAlta_.setND(fMayores_[i].getND());
 				sumaMayor = aux;
 	      pos = i;
 	    }
 	  }
 	}
-	/* Devolvemos la posición de la ficha mayor, doble o no,
-		 que coincide con la posición del jugador en el
-		 vector jugadores_, así como con su ID. Así, cada
-		 jugador comprobará si le toca a él empezar a jugar.*/
-	return pos;
+	/* Devolvemos la ficha mayor, doble o no, y los jugadores_
+     comprobarán si la tienen, comenzando aquel que la tenga.*/
+	return masAlta_;
 };
 
 bool Partida::tableroVacio(){
