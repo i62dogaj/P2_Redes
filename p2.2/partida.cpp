@@ -41,6 +41,20 @@ int Partida::getExtD(){
 	return (tablero_.back()).getND();
 };
 
+//MANIPULACION SERVIDOR (INICIAR PARTIDA)
+int Partida::getSocket1(){
+   return socket1_;
+};
+
+int Partida::getSocket2(){
+   return socket2_;
+};
+
+int Partida::getTurno(){
+   return turno_;
+};
+
+
 Ficha Partida::getMasAlta(){
   return masAlta_;
 };
@@ -206,3 +220,15 @@ void Partida::anadirFichaTablero(Ficha a, int lugar){
 //void Partida::anadirFichaMonton(Ficha a){
 //	monton_.push_back(a);
 //};
+
+void Partida:setSocket1(int socket){
+   socket1_ = socket;
+};
+
+void Partida::setSocket2(int socket){
+   socket2_ = socket;
+};
+
+void Partida::setTurno(int turno){
+   turno_ = turno;
+};

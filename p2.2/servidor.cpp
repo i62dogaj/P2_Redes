@@ -12,6 +12,8 @@
 #include <map>
 #include <vector>
 #include <fstream>
+#include "partida.hpp"
+#include "jugador.hpp"
 
 
 #define MSG_SIZE 250
@@ -57,12 +59,13 @@ int main ( )
 	char buffer[MSG_SIZE];
 	socklen_t from_len;
 
-	fd_set readfds, auxfds, usuario_correcto, usuario_validado;
+	fd_set readfds, auxfds, usuario_correcto, usuario_validado, usuario_jugando, usuario_esperandoPartida;
 
 	int salida;
 	int arrayClientes[MAX_CLIENTS];
 	int numClientes=0;
 	std::map<int, std::string> usuarios; //vector de usuarios donde asocia cada nombre de usuario a su socket
+	std::vector<Partida> partidas;
 
 	//contadores
 	int i,j,k;
@@ -230,14 +233,14 @@ int main ( )
 
 											if (FD_ISSET(i, &usuario_correcto)) {
 												bzero(buffer,sizeof(buffer));
-												strcpy(buffer,"-ERR. Usuario correcto, no puede registrarse\0");
+												strcpy(buffer,"-ERR. Usuario en estado correcto, no puede registrarse\0");
 												send(i,buffer,strlen(buffer),0);
 												break;
 											}
 
 											if (FD_ISSET(i, &usuario_validado)) {
 												bzero(buffer,sizeof(buffer));
-												strcpy(buffer,"-ERR. Usuario validado, no puede registrarse\0");
+												strcpy(buffer,"-ERR. Usuario en estado validado, no puede registrarse\0");
 												send(i,buffer,strlen(buffer),0);
 												break;
 											}
@@ -322,7 +325,7 @@ int main ( )
 
 											if (FD_ISSET(i, &usuario_validado)) {
 												bzero(buffer,sizeof(buffer));
-												strcpy(buffer,"-ERR. Usuario validado, no puede inicar sesión\0");
+												strcpy(buffer,"-ERR. Usuario en estado validado, no puede inicar sesión\0");
 												send(i,buffer,strlen(buffer),0);
 												break;
 											}
@@ -331,14 +334,13 @@ int main ( )
 											bool pedirContrasena=false; //variable para controlar si pedimos contraseña o no
 											char usuario[20];
 											int tamBuffer=strlen(buffer);
+											bool var=false;
 
 											std::string lineaFichero, busquedaUsuario;
 
 											bzero(usuario, sizeof(usuario));
 											strncpy(usuario, buffer+8, tamBuffer-9);//Metemos en usuario la cadena que va desde la posicion buffer+8
 																								//hasta (tam_buffer-9) posiciones a la derecha
-											//std::cout << "\n" << "Impresion valor usuario: " << usuario << '\n';
-											bool var=false;
 
 											//CONTROL MISMO USUARIO NO PUEDA LOGUEARSE 2 VECES
 											for (size_t z = 0; z < usuarios.size(); z++) {
@@ -346,7 +348,6 @@ int main ( )
 													bzero(buffer,sizeof(buffer));
 													strcpy(buffer,"-ERR. Este usuario ya se encuentra logueado en el sistema, no puede inicar sesión\0");
 													send(i,buffer,strlen(buffer),0);
-													//break;//ERROR A SOLUCIONAR -> ESTE BREAK NO FUNCIONA
 													var=true;
 												}
 											}
@@ -453,9 +454,53 @@ int main ( )
 										else if(strcmp(buffer, "INICIAR-PARTIDA\n")==0){
 
 		                           if(FD_ISSET(i, &usuario_validado)){//Comprobamos si el usuario esta validado para dejar entrar en una partida o no
-												bzero(buffer,sizeof(buffer));
-		                              strcpy(buffer,"Usuario validado ha entrado en una partida\0");
-		                              send(i,buffer,strlen(buffer),0);
+												//bzero(buffer,sizeof(buffer));
+		                              //strcpy(buffer,"Usuario validado ha entrado en una partida\0");
+		                              //send(i,buffer,strlen(buffer),0);
+
+												if(partidas.size()>0){
+													if(partidas.back().getSocket2()==-1){
+														int socket1=partidas.back().getSocket1();
+
+														partidas.back().setSocket2(i);
+														partidas.back().setTurno(socket1);
+
+														FD_CLR(socket1, &usuario_esperandoPartida);
+														FD_SET(socket1, &usuario_jugando);
+														FD_SET(i, &usuario_jugando);
+
+														bzero(buffer,sizeof(buffer));
+														strcpy(buffer,"+OK Comienza la partida.\0");
+														send(i, buffer, strlen(buffer), 0);
+														send(socket1 ,buffer,strlen(buffer),0);
+
+													}
+													else{
+														//crear nuevo Panel
+														Partida nuevo;
+														nuevo.setSocket1(i);
+														FD_SET(i, &usuario_esperandoPartida);
+														partidas.push_back(nuevo);
+
+														bzero(buffer,sizeof(buffer));
+														strcpy(buffer,"+OK Waiting for a player\0");
+														send(i,buffer,strlen(buffer),0);
+													}
+												}
+												else{
+													//inicializar el vector
+													Partida nuevo;
+													nuevo.setSocket1(i);
+													FD_SET(i, &usuario_esperandoPartida);
+													partidas.push_back(nuevo);
+
+													bzero(buffer,sizeof(buffer));
+													strcpy(buffer,"+OK Waiting for a player\0");
+													send(i,buffer,strlen(buffer),0);
+												}
+
+
+
 		                           }
 		                           else{
 		                              bzero(buffer,sizeof(buffer));
@@ -463,6 +508,7 @@ int main ( )
 		                              send(i,buffer,strlen(buffer),0);
 		                           }
 		                        }//CIERRE INICIAR-PARTIDA
+
 
 
 										else{
