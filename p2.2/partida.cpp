@@ -56,7 +56,11 @@ int Partida::getTurno(){
    return turno_;
 };
 
+<<<<<<< HEAD
+Jugador &Partida::getJugador(int socket){
+=======
 Jugador & Partida::getJugador(const int socket){
+>>>>>>> 63035a9dc15cf296f6600cd4d1fa07ccd8b6b83d
   if(socket == getSocket1()){
     return jugadores_[0];
   }
