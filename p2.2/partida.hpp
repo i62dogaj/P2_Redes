@@ -49,7 +49,7 @@ class Partida{
     int getSocket2();
     int getTurno();
 
-    Jugador *getJugador(int socket);
+    Jugador & getJugador(int socket);
 
 		//MODIFICADORES
     void setIDPartida(int id);
