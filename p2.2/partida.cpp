@@ -10,9 +10,9 @@ Partida::Partida(int id){ //Asignamos un ID y generamos todas las fichas sin rep
 		for(int j = k; j < 7; j++){
 			Ficha a(i,j);
 			/* Si no queremos que haya dobles para probar la segunda
-			   forma de empezar añadir (!a.esDoble()). Normalmente
+			   forma de empezar, añadir (!a.esDoble()). Normalmente
 				 siempre salen dobles. */
-			if(!buscarFicha(a)) monton_.push_back(a);
+			if(!buscarFichaMonton(a)) monton_.push_back(a);
 		}
 		k++;
 	}
@@ -139,7 +139,7 @@ bool Partida::montonVacio(){
   else return false;
 };
 
-bool Partida::buscarFicha(Ficha a){
+bool Partida::buscarFichaMonton(Ficha a){
 	for(int i = 0; i < monton_.size(); i++){
 		if((a.getNI() == monton_[i].getNI()) && (a.getND() == monton_[i].getND())){
 			return true;
@@ -221,7 +221,7 @@ void Partida::anadirFichaTablero(Ficha a, int lugar){
 //	monton_.push_back(a);
 //};
 
-void Partida:setSocket1(int socket){
+void Partida::setSocket1(int socket){
    socket1_ = socket;
 };
 
