@@ -56,7 +56,7 @@ int main(){
 	cout << "Jugador 2:\n";
 	j2.mostrarMano();
 	cout << endl;*/
-	int opt;
+	int opt, NI, ND, extremo;
 
 
 
@@ -104,18 +104,32 @@ int main(){
 							break;
 
 						case 2:
-							if(turno == j0.getID()) j0.mostrarMano();
-							else if(turno == j1.getID()) j1.mostrarMano();
+							if(turno == j0.getID()){
+								buffer = j0.mostrarMano();
+								cout << buffer << endl;
+							}
+							else if(turno == j1.getID()){
+								buffer = j1.mostrarMano();
+								cout << buffer << endl;
+							}
 						//	else if(turno == j2.getID()) j2.mostrarMano();
 							//j0.mostrarMano();
 							break;
 
 						case 3:
+						cout << "NI: ";
+						cin >> NI;
+						cout << "ND: ";
+						cin >> ND;
+						cout << "\n[1] Izquierda    [2] Derecha: ";
+						cin >> extremo;
 						if(turno == j0.getID()){
-							if(j0.colocarFicha(&p)) turno = 1;
+							if(j0.colocarFicha(NI, ND, extremo, &p)) turno = 1;
+							else cout << "\nEsta ficha no se puede colocar\n";
 						}
 						else if(turno == j1.getID()){
-							if(j1.colocarFicha(&p)) turno = 0;
+							if(j1.colocarFicha(NI, ND, extremo, &p)) turno = 0;
+							else cout << "\nEsta ficha no se puede colocar\n";
 						}
 						//	else if(turno == j2.getID()) j2.colocarFicha(&p);
 							//j0.colocarFicha(&p);

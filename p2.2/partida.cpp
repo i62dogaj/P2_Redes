@@ -56,12 +56,12 @@ int Partida::getTurno(){
    return turno_;
 };
 
-Jugador *Partida::getJugador(int socket){
-  if(socket == socket1){
-    return *jugadores_[0];
+Jugador & Partida::getJugador(const int socket){
+  if(socket == getSocket1()){
+    return jugadores_[0];
   }
-  else if(socket == socket2){
-    return *jugadores_[1];
+  else if(socket == getSocket2()){
+    return jugadores_[1];
   }
 };
 
