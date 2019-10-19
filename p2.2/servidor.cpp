@@ -568,20 +568,57 @@ int main ( )
 										/*-----------------------------------------------------------------------
 										COLOCAR-FICHA
 										------------------------------------------------------------------------ */
-										else if(strcmp(buffer, "COLOCAR-FICHA\n")==0){
+										else if(strstr(buffer, "COLOCAR-FICHA")!=NULL){
 
 											//Tengo que saber en que partida esta el usuario que ha escrito colocar-ficha
 											//Para poder cambiar el tablero que le corresponde y no otro
 
-		                           if(FD_ISSET(i, &usuario_jugando)){
-																 int idPartida;
-																 for(int z = 0; z < partidas.size(); z++){
-																	 if((partidas[z].getSocket1() == i) || (partidas[z].getSocket2() == i)){
-																		 idPartida = z;
-																	 }
-																 }
-																 partidas[idPartida].getJugador(i).colocarFicha(&partidas[idPartida]);
+		                           //if(FD_ISSET(i, &usuario_correcto)){
 
+											if(true){
+
+												//Comprobacion extremo
+												char *auxIzquierda, *auxDerecha;
+												int izquierdo, derecho, valorExtremo;
+												char izquierda[20], derecha[20];
+
+												bzero(izquierda, sizeof(izquierda));
+												bzero(derecha, sizeof(derecha));
+
+												auxIzquierda = strstr(buffer, "izquierd"); //izquierda -> 1
+												auxDerecha = strstr(buffer, "derech"); //derecha -> 2
+
+												if((auxIzquierda == NULL) && ((auxDerecha == NULL))){
+													bzero(buffer,sizeof(buffer));
+													strcpy(buffer,"-ERR. No ha introducido el extremo\0");
+													send(i,buffer,strlen(buffer),0);
+													break;
+												}
+
+												if(auxIzquierda != NULL){
+													valorExtremo=1;
+												}
+												else{
+													valorExtremo=2;
+												}
+
+												strncpy(izquierda, buffer+15, 1);
+												strncpy(derecha, buffer+17, 1);
+
+												izquierdo = atoi(izquierda);
+												derecho = atoi(derecha);
+
+												//El ahorcamiento por aqui y así queda todo bien ordenadito
+
+												/*
+												int idPartida;
+												for(int z = 0; z < partidas.size(); z++){
+													if((partidas[z].getSocket1() == i) || (partidas[z].getSocket2() == i)){
+														idPartida = z;
+													}
+												}
+												partidas[idPartida].getJugador(i).colocarFicha(&partidas[idPartida]);
+												*/
 
 		                           }
 		                           else{
