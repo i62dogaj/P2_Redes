@@ -32,25 +32,25 @@ int main(){
 	cout << endl;
 
 	vector <Partida> partida;
-	Partida p(1); //ID a 1 en prueba
+	Partida p;
 	partida.push_back(p);
 	int id, turno;
 	//cout << "N Jugadores: " << p.getNJugadores() << endl;
 	Ficha a;
 	Jugador j0(0,"irene", "1234", &p);
-	id = p.nuevoJugador(&j0);
+	p.nuevoJugador(&j0);
 	//j0.setID(id);
 	cout << "Jugador 0:\n";
 	j0.mostrarMano();
 	cout << endl;
 	Jugador j1(1,"pepe", "1234", &p);
-	id = p.nuevoJugador(&j1);
+	p.nuevoJugador(&j1);
 	//j1.setID(id);
 	cout << "Jugador 1:\n";
 	j1.mostrarMano();
 	cout << endl;
 /*	Jugador j2(2,"paco", "1234", &p);
-	id = p.nuevoJugador(&j2);
+	p.nuevoJugador(&j2);
 	//j2.setID(id);
 	cout << "Jugador 2:\n";
 	j2.mostrarMano();
