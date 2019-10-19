@@ -68,8 +68,9 @@ int main(){
 
 			case 1:*/
 				cout << "	Bienvenidos a la partida.\n";
-				a.setNI(p.iniciarPartida().getNI());
-				a.setND(p.iniciarPartida().getND());
+				a = p.iniciarPartida();
+				//a.setNI(p.iniciarPartida().getNI());
+				//a.setND(p.iniciarPartida().getND());
 				//cout << "Ficha más alta:\n";
 				//a.mostrarFicha();
 				//cout << "\n	PUNTOS JUGADOR 0: " << j0.getPuntos() << endl;

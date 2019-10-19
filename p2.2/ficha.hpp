@@ -15,30 +15,21 @@ class Ficha{
 
 	public:
 		//Constructores
-		inline Ficha(){};
-		inline Ficha(int I, int D){
-			setNI(I);
-			setND(D);
-		};
+		Ficha();
+		Ficha(int I, int D);
 
 		//OBSERVADORES
-		inline int getNI(){ return nI_;};
-		inline int getND(){ return nD_;};
-		inline void mostrarFicha(){
-			cout << " |" << getNI() << "|" << getND() << "|" << endl;
-		};
-		inline bool esDoble(){
-			if(getNI() == getND()){
-				return true;
-			}
-			else{
-				return false;
-			}
-		};
+		int getNI() const;
+		int getND() const;
+		void mostrarFicha();
+		bool esDoble();
 
 		//MODIFICADORES
-		inline void setNI(int num){ nI_ = num; };
-		inline void setND(int num){ nD_ = num; };
+		void setNI(int num);
+		void setND(int num);
+
+		//OPERADORES DE ASIGNACIÓN
+		Ficha & operator=(Ficha const &a);
 
 		//DESTRUCTOR
 		~Ficha(){};
