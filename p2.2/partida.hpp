@@ -41,7 +41,7 @@ class Partida{
     Ficha iniciarPartida();
     bool tableroVacio();
     bool montonVacio();
-    bool buscarFicha(Ficha a);
+    bool buscarFichaMonton(Ficha a);
     void mostrarMonton();
     void mostrarTablero();
 
