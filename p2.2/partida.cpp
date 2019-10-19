@@ -56,6 +56,15 @@ int Partida::getTurno(){
    return turno_;
 };
 
+Jugador *Partida::getJugador(int socket){
+  if(socket == socket1){
+    return *jugadores_[0];
+  }
+  else if(socket == socket2){
+    return *jugadores_[1];
+  }
+};
+
 
 Ficha Partida::getMasAlta(){
   return masAlta_;

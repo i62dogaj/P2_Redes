@@ -5,7 +5,7 @@ using namespace std;
 Jugador::Jugador(Partida *p){
 	setManoInicial(p->repartir());
 	setConectado(1);
-	setIDPartida(p->getIDPartida());
+	//setIDPartida(p->getIDPartida());
 	//setID(p->getNJugadores());
 };
 
@@ -209,7 +209,7 @@ void Jugador::girarFicha(Ficha *a){
 	a->setND(aux);
 };
 
-bool Jugador::colocarFicha(Partida *p){
+bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 	int n, pos;
 	bool colocada = false;
 	Ficha a;
