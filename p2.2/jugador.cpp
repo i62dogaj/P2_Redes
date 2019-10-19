@@ -9,9 +9,9 @@ Jugador::Jugador(Partida *p){
 	//setID(p->getNJugadores());
 };
 
-Jugador::Jugador(int id, string login, string pass, Partida *p){
-	setLogin(login);
-	setPass(pass);
+Jugador::Jugador(int id, Partida *p){
+	//setLogin(login);
+	//setPass(pass);
 	setConectado(1);
 	setManoInicial(p->repartir());
 	setIDPartida(p->getIDPartida());

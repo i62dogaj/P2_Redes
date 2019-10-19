@@ -473,6 +473,8 @@ int main ( )
 																		strcpy(buffer,"+OK Comienza la partida.\0");
 																		send(i, buffer, strlen(buffer), 0);
 																		send(socket1 ,buffer,strlen(buffer),0);
+																		Jugador j1(partidas.back().getSocket1(), &partidas.back());
+																		Jugador j2(partidas.back().getSocket2(), &partidas.back());
 
 																	}
 																	else{
