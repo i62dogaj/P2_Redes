@@ -93,6 +93,7 @@ int Jugador::buscarFicha(Ficha a){
 			return i;
 		}
 	}
+	return 100000;
 };
 
 bool Jugador::tieneDobles(){
