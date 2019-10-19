@@ -44,6 +44,7 @@ class Jugador{
 	  Ficha dobleMasAlta();
 		Ficha masAlta();
 		bool puedePoner(Partida *p);
+		bool tieneFichas();
 
 
 		//MODIFICADORES

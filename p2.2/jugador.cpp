@@ -146,6 +146,15 @@ bool Jugador::puedePoner(Partida *p){
 	return false;
 };
 
+bool Jugador::tieneFichas(){
+	if(nFichas() > 0){
+		return true;
+	}
+	else{
+		return false;
+	}
+};
+
 
 void Jugador::setID(int id){
 	ID_ = id;
