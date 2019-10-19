@@ -42,14 +42,18 @@ class Partida{
     bool tableroVacio();
     bool montonVacio();
     bool buscarFichaMonton(Ficha a);
-    void mostrarMonton();
-    void mostrarTablero();
+    string mostrarMonton();
+    string mostrarTablero();
 
     int getSocket1();
     int getSocket2();
     int getTurno();
 
+<<<<<<< HEAD
     Jugador &getJugador(int socket);
+=======
+    Jugador & getJugador(int socket);
+>>>>>>> 63035a9dc15cf296f6600cd4d1fa07ccd8b6b83d
 
 		//MODIFICADORES
     void setIDPartida(int id);
