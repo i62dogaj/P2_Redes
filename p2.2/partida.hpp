@@ -23,13 +23,17 @@ class Partida{
 		vector <Ficha> fMayores_; //Para las fichas mayores al iniciar partida si no hubiera dobles
     Ficha masAlta_;
 
+    int socket1_;
+    int socket2_;
+    int turno_;
+
   public:
     //Constructores
     Partida(int id);
 
     //OBSERVADORES
     int getIDPartida();
-		int getIDJugador(string login);
+	 int getIDJugador(string login);
     int getNJugadores();
     int getExtI();
     int getExtD();
@@ -41,6 +45,10 @@ class Partida{
     void mostrarMonton();
     void mostrarTablero();
 
+    int getSocket1();
+    int getSocket2();
+    int getTurno();
+
 		//MODIFICADORES
     void setIDPartida(int id);
     void setNJugadores(int n);
@@ -50,6 +58,10 @@ class Partida{
 		vector<Ficha> repartir();
 		Ficha robar();
     void anadirFichaTablero(Ficha a, int lugar);
+
+    void setSocket1(int socket);
+    void setSocket2(int socket);
+    void setTurno(int turno);
 
     //Cuando un jugador sale de la partida se devuelven las fichas que le quedaran
     //void anadirFichaMonton(Ficha a);
