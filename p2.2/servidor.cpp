@@ -50,6 +50,8 @@ int main ( )
 	std::map<int, std::string> usuarios; //vector de usuarios donde asocia cada nombre de usuario a su socket
 	std::vector<Partida> partidas;
 
+	std::map<int, Ficha> fichas;
+
 	//contadores
 	int i,j,k;
    int recibidos;
@@ -438,10 +440,12 @@ int main ( )
 
 											bool estado=false;
 
-		                           if(FD_ISSET(i, &usuario_validado)){//Comprobamos si el usuario esta validado para dejar entrar en una partida o no
+		                          // if(FD_ISSET(i, &usuario_validado)){//Comprobamos si el usuario esta validado para dejar entrar en una partida o no
 											//bzero(buffer,sizeof(buffer));
 	                              //strcpy(buffer,"Usuario validado ha entrado en una partida\0");
 	                              //send(i,buffer,strlen(buffer),0);
+
+											if(true){
 
 												if(partidas.size()>0){
 													for (size_t z = 0; z < partidas.size(); z++) {
@@ -481,33 +485,35 @@ int main ( )
 															send(socket2,buffer,strlen(buffer),0);
 
 
-															Ficha a;
-															a = partidas[z].iniciarPartida();
+
+															fichas[z] = partidas[z].iniciarPartida();
+
+															//fichas.insert(z, partidas[z].iniciarPartida());
+
 
 															//Comprobar quien tiene el doble más alto o la ficha mas mas alta
 															//Y decirle a este que es su turno y al otro que espere
-															if(j1.existeFicha(a)){
+															if(j1.existeFicha(fichas[z])){
 																bzero(buffer,sizeof(buffer));
-																strcpy(buffer,"\0+OK. Turno de partida\0");
+																sprintf(buffer, "\n+OK. Turno de partida\n");
 																send(socket1, buffer, strlen(buffer),0);
 
+
 																bzero(buffer,sizeof(buffer));
-																strcpy(buffer,"\0+OK. Turno del otro jugador\0");
+																sprintf(buffer, "\n+OK. Turno del otro jugador\n");
 																send(socket2, buffer, strlen(buffer),0);
 
-
 															}
-															else if(j2.existeFicha(a)){
+															else if(j2.existeFicha(fichas[z])){
 																bzero(buffer,sizeof(buffer));
-																strcpy(buffer,"\0+OK. Turno de partida\0");
+																sprintf(buffer, "\n+OK. Turno de partida\n");
 																send(socket2 ,buffer,strlen(buffer),0);
 
+
 																bzero(buffer,sizeof(buffer));
-																strcpy(buffer,"\0+OK. Turno del otro jugador\0");
+																sprintf(buffer, "\n+OK. Turno del otro jugador\n");
 																send(socket1 ,buffer,strlen(buffer),0);
 															}
-
-
 
 														}
 
@@ -602,6 +608,7 @@ int main ( )
 												partidas[idPartida].getJugador(i).colocarFicha(&partidas[idPartida]);
 												*/
 
+
 		                           }
 		                           else{
 		                              bzero(buffer,sizeof(buffer));
@@ -665,7 +672,49 @@ int main ( )
 
 
 
+										/*-----------------------------------------------------------------------
+										PASO-TURNO
+										------------------------------------------------------------------------ */
+										else if(strcmp(buffer, "ID-PARTIDA\n")==0){
 
+											//if(FD_ISSET(i, &usuario_jugando)){
+											/*
+											bzero(buffer,sizeof(buffer));
+											strcpy(buffer,"+Ok. No es necesario pasar turno\0");
+											send(i,buffer,strlen(buffer),0);
+											*/
+
+
+											if(true){
+
+												string cadenaPartida;
+
+												int idPartida;
+												for(int z = 0; z < partidas.size(); z++){
+													if((partidas[z].getSocket1() == i) || (partidas[z].getSocket2() == i)){
+														idPartida = z;
+													}
+												}
+
+
+												cadenaPartida = to_string(idPartida);
+
+
+												bzero(buffer,sizeof(buffer));
+		                              strcpy(buffer,cadenaPartida.c_str());
+		                              send(i,buffer,strlen(buffer),0);
+
+
+
+											}
+
+											else{
+		                              bzero(buffer,sizeof(buffer));
+		                              strcpy(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede pasar turno\0");
+		                              send(i,buffer,strlen(buffer),0);
+		                           }
+
+										}//CIERRE PASO-TURNO
 
 
 
