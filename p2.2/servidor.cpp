@@ -204,7 +204,31 @@ int main ( )
 								 if(recibidos > 0){
 
 									 if(strcmp(buffer,"SALIR\n") == 0){
+										 int who = i;
 										 salirCliente(i,&readfds,&numClientes,arrayClientes);
+
+										 int idPartida;
+										 for(int z = 0; z < partidas.size(); z++){
+											 if((partidas[z].getSocket1() == i) || (partidas[z].getSocket2() == i)){
+												 idPartida = z;
+											 }
+										 }
+
+										int socket1 = partidas[idPartida].getSocket1();
+										int socket2 = partidas[idPartida].getSocket2();
+
+										partidas[idPartida].setSocket1(-1);
+										partidas[idPartida].setSocket2(-1);
+
+										if(who == socket1){
+											FD_SET(socket2, &usuario_validado);
+											FD_CLR(socket2, &usuario_jugando);
+										}
+										else{
+											FD_SET(socket1, &usuario_validado);
+											FD_CLR(socket1, &usuario_jugando);
+										}
+
 									 }
 
 									 else
@@ -449,7 +473,20 @@ int main ( )
 
 												if(partidas.size()>0){
 													for (size_t z = 0; z < partidas.size(); z++) {
-														if((partidas[z].getSocket2() == -1) && (estado == false)){
+														if((partidas[z].getSocket1() == -1) && (estado == false)){
+															estado = true;
+
+															Partida nuevo;
+															nuevo.setSocket1(i);
+															partidas[z] = nuevo;
+															FD_SET(i, &usuario_esperandoPartida);
+
+															bzero(buffer,sizeof(buffer));
+															strcpy(buffer,"+Ok. Petición Recibida. Quedamos a la espera de más jugadores\0");
+															send(i,buffer,strlen(buffer),0);
+
+														}
+														else if((partidas[z].getSocket2() == -1) && (estado == false)){
 
 															estado=true;
 
@@ -464,7 +501,7 @@ int main ( )
 															FD_SET(i, &usuario_jugando);
 
 															bzero(buffer,sizeof(buffer));
-															strcpy(buffer,"+OK. Empienza la partida.\0");
+															strcpy(buffer,"+OK. Empieza la partida.\0");
 															send(i, buffer, strlen(buffer), 0);
 															send(socket1 ,buffer,strlen(buffer),0);
 
@@ -622,39 +659,67 @@ int main ( )
 														send(socket1,buffer,strlen(buffer),0);
 														send(socket2,buffer,strlen(buffer),0);
 
-														bzero(buffer,sizeof(buffer));
-														sprintf(buffer, "%s\n", partidas[idPartida].getJugador(socket1).mostrarMano().c_str());
-														send(socket1,buffer,strlen(buffer),0);
-														bzero(buffer,sizeof(buffer));
-														sprintf(buffer, "%s\n", partidas[idPartida].getJugador(socket2).mostrarMano().c_str());
-														send(socket2,buffer,strlen(buffer),0);
+														if(partidas[idPartida].getJugador(i).nFichas() == 0){
+															bzero(buffer,sizeof(buffer));
+															sprintf(buffer, "\n+OK. Has ganado la partida.\n");
+															send(i,buffer,strlen(buffer),0);
+															if(i == socket1){
+																bzero(buffer,sizeof(buffer));
+																sprintf(buffer, "\n+OK. Has perdido la partida.\n");
+																send(socket2,buffer,strlen(buffer),0);
+															}
+															else{
+																bzero(buffer,sizeof(buffer));
+																sprintf(buffer, "\n+OK. Has perdido la partida.\n");
+																send(socket1,buffer,strlen(buffer),0);
+															}
 
-														if(i == socket1){
-															partidas[idPartida].setTurno(socket2);
+															partidas[idPartida].setSocket1(-1);
+															partidas[idPartida].setSocket2(-1);
 
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK Turno del otro jugador.\n");
-															send(socket1, buffer, strlen(buffer), 0);
+															FD_SET(socket1, &usuario_validado);
+															FD_SET(socket2, &usuario_validado);
 
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK Turno de partida.\n");
-															send(socket2, buffer, strlen(buffer), 0);
+															FD_CLR(socket1, &usuario_jugando);
+															FD_CLR(socket2, &usuario_jugando);
 														}
 														else{
-															partidas[idPartida].setTurno(socket1);
 
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK Turno del otro jugador.\n");
-															send(socket2, buffer, strlen(buffer), 0);
+															bzero(buffer,sizeof(buffer));
+															sprintf(buffer, "%s\n", partidas[idPartida].getJugador(socket1).mostrarMano().c_str());
+															send(socket1,buffer,strlen(buffer),0);
 
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK Turno de partida.\n");
-															send(socket1, buffer, strlen(buffer), 0);
+															bzero(buffer,sizeof(buffer));
+															sprintf(buffer, "%s\n", partidas[idPartida].getJugador(socket2).mostrarMano().c_str());
+															send(socket2,buffer,strlen(buffer),0);
+
+															if(i == socket1){
+																partidas[idPartida].setTurno(socket2);
+
+																bzero(buffer, sizeof(buffer));
+																sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
+																send(socket1, buffer, strlen(buffer), 0);
+
+																bzero(buffer, sizeof(buffer));
+																sprintf(buffer, "\n+OK. Turno de partida.\n");
+																send(socket2, buffer, strlen(buffer), 0);
+															}
+															else{
+																partidas[idPartida].setTurno(socket1);
+
+																bzero(buffer, sizeof(buffer));
+																sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
+																send(socket2, buffer, strlen(buffer), 0);
+
+																bzero(buffer, sizeof(buffer));
+																sprintf(buffer, "\n+OK. Turno de partida.\n");
+																send(socket1, buffer, strlen(buffer), 0);
+															}
 														}
 													}
 													else{
 														bzero(buffer, sizeof(buffer));
-														sprintf(buffer, "-ERR La ficha no puede ser colocada.\n");
+														sprintf(buffer, "-ERR. La ficha no puede ser colocada.\n");
 														send(i, buffer, strlen(buffer), 0);
 													}
 												}
@@ -730,22 +795,22 @@ int main ( )
 																partidas[idPartida].setTurno(socket2);
 
 																bzero(buffer, sizeof(buffer));
-																sprintf(buffer, "\n+OK Turno del otro jugador.\n");
+																sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
 																send(socket1, buffer, strlen(buffer), 0);
 
 																bzero(buffer, sizeof(buffer));
-																sprintf(buffer, "\n+OK Turno de partida.\n");
+																sprintf(buffer, "\n+OK. Turno de partida.\n");
 																send(socket2, buffer, strlen(buffer), 0);
 															}
 															else{
 																partidas[idPartida].setTurno(socket1);
 
 																bzero(buffer, sizeof(buffer));
-																sprintf(buffer, "\n+OK Turno del otro jugador.\n");
+																sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
 																send(socket2, buffer, strlen(buffer), 0);
 
 																bzero(buffer, sizeof(buffer));
-																sprintf(buffer, "\n+OK Turno de partida.\n");
+																sprintf(buffer, "\n+OK. Turno de partida.\n");
 																send(socket1, buffer, strlen(buffer), 0);
 															}
 														}
@@ -803,29 +868,29 @@ int main ( )
 															partidas[idPartida].setTurno(socket2);
 
 															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK Turno del otro jugador.\n");
+															sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
 															send(socket1, buffer, strlen(buffer), 0);
 
 															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK Turno de partida.\n");
+															sprintf(buffer, "\n+OK. Turno de partida.\n");
 															send(socket2, buffer, strlen(buffer), 0);
 														}
 														else{
 															partidas[idPartida].setTurno(socket1);
 
 															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK Turno del otro jugador.\n");
+															sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
 															send(socket2, buffer, strlen(buffer), 0);
 
 															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK Turno de partida.\n");
+															sprintf(buffer, "\n+OK. Turno de partida.\n");
 															send(socket1, buffer, strlen(buffer), 0);
 														}
 													}
 												}
 												else{
 													bzero(buffer, sizeof(buffer));
-													sprintf(buffer, "-ERR No es tu turno.\n");
+													sprintf(buffer, "-ERR. No es tu turno.\n");
 													send(i, buffer, strlen(buffer), 0);
 												}
 											}
