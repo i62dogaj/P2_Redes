@@ -37,6 +37,10 @@ class Partida{
     int getNJugadores();
     int getExtI();
     int getExtD();
+    vector<Ficha> getMonton();
+    vector<Ficha> getTablero();
+    vector<Ficha> getFichasDobles();
+    vector<Ficha> getFichasMayores();
     Ficha getMasAlta();
     Ficha iniciarPartida();
     bool tableroVacio();
@@ -48,16 +52,17 @@ class Partida{
     int getSocket1();
     int getSocket2();
     int getTurno();
-
-<<<<<<< HEAD
     Jugador &getJugador(int socket);
-=======
-    Jugador & getJugador(int socket);
->>>>>>> 63035a9dc15cf296f6600cd4d1fa07ccd8b6b83d
+
 
 		//MODIFICADORES
     void setIDPartida(int id);
     void setNJugadores(int n);
+    void setMonton(vector <Ficha> vec);
+    void setTablero(vector <Ficha> vec);
+    void setFichasDobles(vector <Ficha> vec);
+    void setFichasMayores(vector <Ficha> vec);
+    void setMasAlta();
     void masNJugadores();
     void menosNJugadores();
     void nuevoJugador(Jugador *j);
@@ -69,8 +74,9 @@ class Partida{
     void setSocket2(int socket);
     void setTurno(int turno);
 
-    //Cuando un jugador sale de la partida se devuelven las fichas que le quedaran
-    //void anadirFichaMonton(Ficha a);
+
+    //OPERADORES DE ASIGNACIÓN
+		Partida & operator=(Partida &p);
 
 
 };

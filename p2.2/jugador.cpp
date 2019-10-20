@@ -4,7 +4,6 @@ using namespace std;
 
 Jugador::Jugador(Partida *p){
 	setManoInicial(p->repartir());
-	setConectado(1);
 	//setIDPartida(p->getIDPartida());
 	//setID(p->getNJugadores());
 };
@@ -12,7 +11,6 @@ Jugador::Jugador(Partida *p){
 Jugador::Jugador(int id, Partida *p){
 	//setLogin(login);
 	//setPass(pass);
-	setConectado(1);
 	setManoInicial(p->repartir());
 	setIDPartida(p->getIDPartida());
 	setID(id);
@@ -29,10 +27,6 @@ string Jugador::getLogin(){
 
 string Jugador::getPass(){
 	return password_;
-};
-
-int Jugador::getConectado(){
-	return conectado_;
 };
 
 int Jugador::getIDPartida(){
@@ -182,10 +176,6 @@ void Jugador::setPass(string pass){
 	password_ = pass;
 };
 
-void Jugador::setConectado(int flag){
-	conectado_ = flag;
-};
-
 void Jugador::setIDPartida(int id){
 	idPartida_ = id;
 };
@@ -225,15 +215,15 @@ bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 	if(!existeFicha(a)){
 		return false;
 	}
-	
+
 	pos = buscarFicha(a);
 	// ------ Comprobamos que la primera que ponga, si sale él, sea la doble mayor -----
 	if(p->tableroVacio()){
-		if((mano_[pos].getNI() != p->getMasAlta().getNI()) && (mano_[pos].getND() != p->getMasAlta().getND())){
+		if((mano_[pos].getNI() != p->getMasAlta().getNI()) or (mano_[pos].getND() != p->getMasAlta().getND())){
 			//cout << "\nPara empezar la partida debe colocar su ficha doble más alta.\n";
 			return false;
 		}
-		else{
+		else if((mano_[pos].getNI() == p->getMasAlta().getNI()) && (mano_[pos].getND() == p->getMasAlta().getND())){
 			p->anadirFichaTablero(mano_[pos], 1); //No importa el lugar, se inserta sin más
 			mano_.erase(mano_.begin()+pos);
 			return true;

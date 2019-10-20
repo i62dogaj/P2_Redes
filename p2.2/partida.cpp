@@ -56,11 +56,23 @@ int Partida::getTurno(){
    return turno_;
 };
 
-<<<<<<< HEAD
-Jugador &Partida::getJugador(int socket){
-=======
-Jugador & Partida::getJugador(const int socket){
->>>>>>> 63035a9dc15cf296f6600cd4d1fa07ccd8b6b83d
+vector<Ficha> Partida::getMonton(){
+	return monton_;
+};
+
+vector<Ficha> Partida::getTablero(){
+	return tablero_;
+};
+
+vector<Ficha> Partida::getFichasDobles(){
+	return fDobles_;
+};
+
+vector<Ficha> Partida::getFichasMayores(){
+	return fMayores_;
+};
+
+Jugador & Partida::getJugador(int socket){
   if(socket == getSocket1()){
     return jugadores_[0];
   }
@@ -231,6 +243,22 @@ void Partida::setNJugadores(int n){
 	nJugadores_ = n;
 };
 
+void Partida::setMonton(vector <Ficha> vec){
+	monton_ = vec;
+};
+
+void Partida::setTablero(vector <Ficha> vec){
+	tablero_ = vec;
+};
+
+void Partida::setFichasDobles(vector <Ficha> vec){
+	fDobles_ = vec;
+};
+
+void Partida::setFichasMayores(vector <Ficha> vec){
+	fMayores_ = vec;
+};
+
 void Partida::masNJugadores(){
 	setNJugadores(getNJugadores()+1);
 };
@@ -242,6 +270,12 @@ void Partida::menosNJugadores(){
 void Partida::nuevoJugador(Jugador *j){
   jugadores_.push_back(*j);
   masNJugadores();
+  if(getSocket1() == -1){
+    setSocket1(j->getID());
+  }
+  else if(getSocket2() == -1){
+    setSocket2(j->getID());
+  }
 };
 
 vector<Ficha> Partida::repartir(){
@@ -272,11 +306,6 @@ void Partida::anadirFichaTablero(Ficha a, int lugar){
   }
 };
 
-//Cuando un jugador sale de la partida se devuelven las fichas que le quedaran
-//void Partida::anadirFichaMonton(Ficha a){
-//	monton_.push_back(a);
-//};
-
 void Partida::setSocket1(int socket){
    socket1_ = socket;
 };
@@ -288,3 +317,21 @@ void Partida::setSocket2(int socket){
 void Partida::setTurno(int turno){
    turno_ = turno;
 };
+
+
+//OPERADORES DE ASIGNACIÓN
+Partida & Partida::operator=(Partida &p){
+  /* Copiamos todo excepto el ID, porque lo queremos mantener,
+    la ficha más alta, porque se modificará al iniciar la
+    partida, y el turno. */
+  setNJugadores(p.getNJugadores());
+  setMonton(p.getMonton());
+	setTablero(p.getTablero());
+  setFichasDobles(p.getFichasDobles());
+  setFichasMayores(p.getFichasMayores());
+  setSocket1(p.getSocket1());
+  setSocket2(p.getSocket2());
+
+	// Se devuelve el objeto actual
+	return *this;
+}

@@ -16,7 +16,6 @@ class Jugador{
 		int ID_;
 		string login_;
 		string password_;
-		int conectado_;
 		vector <Ficha> mano_;
 		vector <Ficha> dobles_;
 		int idPartida_;
@@ -31,7 +30,6 @@ class Jugador{
 		int getID();
 		string getLogin();
 		string getPass();
-		int getConectado();
 		int getIDPartida();
 		int getPuntos();
 		vector<Ficha> getMano();
@@ -51,7 +49,6 @@ class Jugador{
 		void setID(int id);
 		void setLogin(string login);
 		void setPass(string pass);
-		void setConectado(int flag);
 		void setIDPartida(int id);
 		void setPuntos(int puntos);
 		void setManoInicial(vector <Ficha> vec);

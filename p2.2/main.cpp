@@ -33,6 +33,7 @@ int main(){
 
 	vector <Partida> partida;
 	Partida p;
+	Partida s;
 	partida.push_back(p);
 	int id, turno;
 	string buffer;
@@ -236,7 +237,18 @@ int main(){
 
 	}while(opcion != 0);
 */
+/*
+buffer = p.mostrarMonton();
+cout << buffer << endl;
+buffer = p.mostrarTablero();
+cout << buffer << endl;
 
+p = s;
+buffer = p.mostrarMonton();
+cout << buffer << endl;
+buffer = p.mostrarTablero();
+cout << buffer << endl;
+*/
 
 	cout << endl;
 }
