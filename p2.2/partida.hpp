@@ -62,7 +62,7 @@ class Partida{
     void setTablero(vector <Ficha> vec);
     void setFichasDobles(vector <Ficha> vec);
     void setFichasMayores(vector <Ficha> vec);
-    void setMasAlta();
+    void setMasAlta(Ficha a);
     void masNJugadores();
     void menosNJugadores();
     void nuevoJugador(Jugador *j);

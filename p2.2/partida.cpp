@@ -259,6 +259,10 @@ void Partida::setFichasMayores(vector <Ficha> vec){
 	fMayores_ = vec;
 };
 
+void Partida::setMasAlta(Ficha a){
+  masAlta_ = a;
+};
+
 void Partida::masNJugadores(){
 	setNJugadores(getNJugadores()+1);
 };
