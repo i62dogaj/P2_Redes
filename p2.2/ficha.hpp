@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctime>
+#include <string.h>
 using namespace std;
 
 class Ficha{
@@ -21,7 +22,7 @@ class Ficha{
 		//OBSERVADORES
 		int getNI() const;
 		int getND() const;
-		void mostrarFicha();
+		string mostrarFicha();
 		bool esDoble();
 
 		//MODIFICADORES
