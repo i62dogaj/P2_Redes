@@ -330,9 +330,9 @@ Partida & Partida::operator=(Partida &p){
     partida, y el turno. */
   setNJugadores(p.getNJugadores());
   setMonton(p.getMonton());
-	setTablero(p.getTablero());
-  setFichasDobles(p.getFichasDobles());
-  setFichasMayores(p.getFichasMayores());
+	tablero_.clear();
+  fDobles_.clear();
+  fMayores_.clear();
   setSocket1(p.getSocket1());
   setSocket2(p.getSocket2());
 
