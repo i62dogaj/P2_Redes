@@ -34,24 +34,7 @@ int main ( )
 
 	/*----------------------------------------------------
 		Descriptor del socket y buffer de datos
-	-----------------------------------------------------
-	std::fstream file;
-	int sd, new_sd;
-	struct sockaddr_in sockname, from;
-	char buffer[MSG_SIZE];
-	socklen_t from_len;
-  fd_set readfds, auxfds, ask_password, auth, waiting_for_player, playing;
-  int salida;
-  int arrayClientes[MAX_CLIENTS];
-  std::map<int, std::string> usuarios;
-  int numClientes = 0;
-  //contadores
-  int i,j,k;
-  int recibidos;
-  char identificador[MSG_SIZE];
-
-  int on, ret;
-*/
+	-----------------------------------------------------*/
 
 	std::fstream file;
 	int sd, new_sd;
@@ -466,8 +449,6 @@ int main ( )
 
 															estado=true;
 
-															Ficha a;
-
 															int socket1=partidas[z].getSocket1();
 
 															partidas[z].setSocket2(i);
@@ -500,10 +481,11 @@ int main ( )
 															send(socket2,buffer,strlen(buffer),0);
 
 
-
-
+															Ficha a;
 															a = partidas[z].iniciarPartida();
 
+															//Comprobar quien tiene el doble más alto o la ficha mas mas alta
+															//Y decirle a este que es su turno y al otro que espere
 															if(j1.existeFicha(a)){
 																bzero(buffer,sizeof(buffer));
 																strcpy(buffer,"\0+OK. Turno de partida\0");
@@ -525,13 +507,12 @@ int main ( )
 																send(socket1 ,buffer,strlen(buffer),0);
 															}
 
-															//Comprobar quien tiene el doble más alto o la ficha mas mas alta
-															//Y decirle a este que es su turno y al otro que espere
+
 
 														}
 
 													}
-													//FUERA DEL FOR. aqui he recorrido el vector entero
+													//FUERA DEL FOR. aqui he recorrido el vector entero y no he encontrado ningun espacio libre en ninguna partida
 
 													if ( (estado == false) && (partidas.size() < 10) ) {
 														Partida nuevo;
@@ -565,6 +546,7 @@ int main ( )
 		                           }
 		                        }//CIERRE INICIAR-PARTIDA
 
+
 										/*-----------------------------------------------------------------------
 										COLOCAR-FICHA
 										------------------------------------------------------------------------ */
@@ -573,7 +555,7 @@ int main ( )
 											//Tengo que saber en que partida esta el usuario que ha escrito colocar-ficha
 											//Para poder cambiar el tablero que le corresponde y no otro
 
-		                           //if(FD_ISSET(i, &usuario_correcto)){
+		                           //if(FD_ISSET(i, &usuario_jugando)){
 
 											if(true){
 
@@ -623,16 +605,73 @@ int main ( )
 		                           }
 		                           else{
 		                              bzero(buffer,sizeof(buffer));
-		                              strcpy(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede introducir ficha\0");
+		                              strcpy(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\0");
 		                              send(i,buffer,strlen(buffer),0);
 		                           }
-		               }
+		               			}//CIERRE COLOCAR-FICHA
+
+
+										/*-----------------------------------------------------------------------
+										ROBAR-FICHA
+										------------------------------------------------------------------------ */
+										else if(strcmp(buffer, "ROBAR-FICHA\n")==0){
+
+											//if(FD_ISSET(i, &usuario_jugando)){
+											/*
+											bzero(buffer,sizeof(buffer));
+											strcpy(buffer,"+Ok. No es necesario robar ficha\0");
+											send(i,buffer,strlen(buffer),0);
+											*/
+
+
+											if(true){
+
+											}
+
+											else{
+		                              bzero(buffer,sizeof(buffer));
+		                              strcpy(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\0");
+		                              send(i,buffer,strlen(buffer),0);
+		                           }
+
+										}//CIERRE ROBAR-FICHA
+
+
+
+										/*-----------------------------------------------------------------------
+										PASO-TURNO
+										------------------------------------------------------------------------ */
+										else if(strcmp(buffer, "PASO-TURNO\n")==0){
+
+											//if(FD_ISSET(i, &usuario_jugando)){
+											/*
+											bzero(buffer,sizeof(buffer));
+											strcpy(buffer,"+Ok. No es necesario pasar turno\0");
+											send(i,buffer,strlen(buffer),0);
+											*/
+
+
+											if(true){
+
+											}
+
+											else{
+		                              bzero(buffer,sizeof(buffer));
+		                              strcpy(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede pasar turno\0");
+		                              send(i,buffer,strlen(buffer),0);
+		                           }
+
+										}//CIERRE PASO-TURNO
+
+
+
+
 
 
 
 										else{
 											bzero(buffer,sizeof(buffer));
-											strcpy(buffer,"-ERR. Comando no renococido\0");
+											strcpy(buffer,"-Err. Comando no renococido\0");
 											send(i,buffer,strlen(buffer),0);
 										}
 									}
