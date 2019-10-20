@@ -17,8 +17,20 @@ int Ficha::getND() const{
   return nD_;
 };
 
-void Ficha::mostrarFicha(){
-	cout << " |" << getNI() << "|" << getND() << "|" << endl;
+string Ficha::mostrarFicha(){
+	char cad[250], I[10], D[10];
+
+	strcpy (cad,"\nFICHA |");
+	sprintf(I, "%d", getNI());
+	sprintf(D, "%d", getND());
+
+	strcat (cad,I);
+	strcat (cad,"|");
+	strcat (cad,D);
+	strcat (cad,"|");
+		
+	string cadena(cad);
+	return cadena;
 };
 
 bool Ficha::esDoble(){
