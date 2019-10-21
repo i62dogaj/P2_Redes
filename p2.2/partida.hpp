@@ -74,6 +74,8 @@ class Partida{
     void setSocket2(int socket);
     void setTurno(int turno);
 
+		void vaciarJugadores();
+
 
     //OPERADORES DE ASIGNACIÓN
 		Partida & operator=(Partida &p);
