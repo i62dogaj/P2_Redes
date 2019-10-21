@@ -165,9 +165,7 @@ int main ( )
 										numClientes++;
 										FD_SET(new_sd,&readfds);
 
-										sprintf(buffer, "+Ok. Usuario conectado\n");
-
-										send(new_sd,buffer,strlen(buffer),0);
+										enviarMensaje(new_sd, "+Ok. Usuario conectado\n");
 
 										for(j=0; j<(numClientes-1);j++){
 
@@ -177,9 +175,7 @@ int main ( )
 										}
 								  }
 								  else{
-										bzero(buffer,sizeof(buffer));
-										sprintf(buffer,"Demasiados clientes conectados\n");
-										send(new_sd,buffer,strlen(buffer),0);
+										enviarMensaje(new_sd, "Demasiados clientes conectados\n");
 										close(new_sd);
 								  }
 
@@ -211,29 +207,28 @@ int main ( )
 									 int who = i;
 									 salirCliente(i,&readfds,&numClientes,arrayClientes);
 
-									 int idPartida, socket1, socket2;
-									 setIDPartidaySockets(i, partidas, idPartida, socket1, socket2);
+									 //Solo si estaba jugando cambiamos lo siguiente
+									 if (FD_ISSET(i, &usuario_jugando)){
+										 int idPartida, socket1, socket2;
+										 setIDPartidaySockets(i, partidas, idPartida, socket1, socket2);
 
-									 partidas[idPartida].getJugador(socket1).salirPartida(&partidas[idPartida]);
-									 partidas[idPartida].getJugador(socket2).salirPartida(&partidas[idPartida]);
-									 partidas[idPartida].setSocket1(-1);
-									 partidas[idPartida].setSocket2(-1);
+										 partidas[idPartida].getJugador(socket1).salirPartida(&partidas[idPartida]);
+										 partidas[idPartida].getJugador(socket2).salirPartida(&partidas[idPartida]);
+										 partidas[idPartida].setSocket1(-1);
+										 partidas[idPartida].setSocket2(-1);
 
-									if(who == socket1){
-										FD_SET(socket2, &usuario_validado);
-										FD_CLR(socket2, &usuario_jugando);
+										if(who == socket1){
+											FD_SET(socket2, &usuario_validado);
+											FD_CLR(socket2, &usuario_jugando);
 
-										bzero(buffer,sizeof(buffer));
-										sprintf(buffer,"+OK. Si quiere, puede iniciar otra partida\n");
-										send(socket2,buffer,strlen(buffer),0);
-									}
-									else{
-										FD_SET(socket1, &usuario_validado);
-										FD_CLR(socket1, &usuario_jugando);
+											enviarMensaje(socket2,"+OK. Si quiere, puede iniciar otra partida.\n");
+										}
+										else{
+											FD_SET(socket1, &usuario_validado);
+											FD_CLR(socket1, &usuario_jugando);
 
-										bzero(buffer,sizeof(buffer));
-										sprintf(buffer,"+OK. Si quiere, puede iniciar otra partida\n");
-										send(socket1,buffer,strlen(buffer),0);
+											enviarMensaje(socket1,"+OK. Si quiere, puede iniciar otra partida.\n");
+										}
 									}
 
 								 }
@@ -248,16 +243,12 @@ int main ( )
 										//PONER USUARIO A ESTADO VALIDADO CUANDO SE REGISTRE CORRECTAMENTE
 
 										if (FD_ISSET(i, &usuario_correcto)) {
-											bzero(buffer,sizeof(buffer));
-											sprintf(buffer,"-ERR. Usuario en estado correcto, no puede registrarse\n");
-											send(i,buffer,strlen(buffer),0);
+											enviarMensaje(i,"-ERR. Usuario en estado correcto, no puede registrarse\n");
 											break;
 										}
 
 										if (FD_ISSET(i, &usuario_validado)) {
-											bzero(buffer,sizeof(buffer));
-											sprintf(buffer,"-ERR. Usuario en estado validado, no puede registrarse\n");
-											send(i,buffer,strlen(buffer),0);
+											enviarMensaje(i,"-ERR. Usuario en estado validado, no puede registrarse\n");
 											break;
 										}
 
@@ -287,9 +278,7 @@ int main ( )
 
 										//Si no se encuentra ocurrencia con -u ó -p en el mensaje del cliente
 										if((auxUser1 == NULL) or ((auxPasswd1 == NULL))){
-											bzero(buffer,sizeof(buffer));
-											sprintf(buffer,"-ERR. Sentencia de registro incorrecta\n");
-											send(i,buffer,strlen(buffer),0);
+											enviarMensaje(i,"-ERR. Sentencia de registro incorrecta\n");
 											break;
 										}
 
@@ -309,9 +298,7 @@ int main ( )
 											if(strcmp(busquedaUsuario.c_str(), usuario)==0)
 											{
 												anadir=false;
-												bzero(buffer,sizeof(buffer));
-												sprintf(buffer,"-ERR. Usuario existente\n");
-												send(i,buffer,strlen(buffer),0);
+												enviarMensaje(i,"-ERR. Usuario existente\n");
 												break;
 											}
 										}
@@ -325,9 +312,7 @@ int main ( )
 										if(anadir)
 										{
 											file << usuario << " " << contrasena << "\n";
-											bzero(buffer,sizeof(buffer));
-											sprintf(buffer,"+Ok. Usuario Registrado\n");
-											send(i,buffer,strlen(buffer),0);
+											enviarMensaje(i,"+Ok. Usuario Registrado\n");
 										}
 										file.close();
 
@@ -340,9 +325,7 @@ int main ( )
 									else if(strstr(buffer, "USUARIO")!=NULL){
 
 										if (FD_ISSET(i, &usuario_validado)) {
-											bzero(buffer,sizeof(buffer));
-											sprintf(buffer,"-ERR. Usuario en estado validado, no puede iniciar sesión\n");
-											send(i,buffer,strlen(buffer),0);
+											enviarMensaje(i,"-ERR. Usuario en estado validado, no puede iniciar sesión\n");
 											break;
 										}
 
@@ -361,9 +344,7 @@ int main ( )
 										//CONTROL MISMO USUARIO NO PUEDA LOGUEARSE 2 VECES
 										for (size_t z = 0; z < usuarios.size(); z++) {
 											if (strcmp(usuarios[z].c_str(), usuario) == 0) {
-												bzero(buffer,sizeof(buffer));
-												sprintf(buffer,"-ERR. Este usuario ya se encuentra logueado en el sistema, no puede iniciar sesión\n");
-												send(i,buffer,strlen(buffer),0);
+												enviarMensaje(i,"-ERR. Este usuario ya se encuentra logueado en el sistema, no puede iniciar sesión\n");
 												var=true;
 											}
 										}
@@ -391,18 +372,14 @@ int main ( )
 										     FD_SET(i, &usuario_correcto);//añadimos el socket "i" (socket el usuario que estamos tratando ahora mismo)
 											   									//al conjunto de sockets usuarios_correctos
 
-										     bzero(buffer,sizeof(buffer));
-										     sprintf(buffer,"+OK. Usuario correcto\n");
-										     send(i,buffer,strlen(buffer),0);
+										     enviarMensaje(i,"+OK. Usuario correcto\n");
 										     file.close();
 										     break;
 										  }
 										}
 
 										if(!pedirContrasena){
-										  bzero(buffer,sizeof(buffer));
-										  sprintf(buffer,"-ERR. Usuario incorrecto\n");
-										  send(i,buffer,strlen(buffer),0);
+										  enviarMensaje(i,"-ERR. Usuario incorrecto\n");
 										  file.close();
 										}
 									}//CIERRE USUARIO
@@ -437,17 +414,14 @@ int main ( )
 											         FD_CLR(i, &usuario_correcto); //borramos el socket i del conjunto de usuarios correctos
 																								//porque ahora pertenece al conjunto de usuarios validados
 
-											         bzero(buffer,sizeof(buffer)); //a partir de aqui pasamos informacion al usuario
-											         sprintf(buffer,"+Ok. Usuario validado\n");
-											         send(i,buffer,strlen(buffer),0);
+											         //a partir de aqui pasamos informacion al usuario
+											         enviarMensaje(i,"+Ok. Usuario validado\n");
 
 											         file.close();
 											         break;
 											      }
 											      else{
-											         bzero(buffer,sizeof(buffer));
-											         sprintf(buffer,"-ERR. Error en la validación\n");
-											         send(i,buffer,strlen(buffer),0);
+											         enviarMensaje(i,"-ERR. Error en la validación\n");
 											         file.close();
 											         break;
 											      }
@@ -457,9 +431,7 @@ int main ( )
 
 									  //En caso de introducir el password antes que el usuario
 										else{
-											bzero(buffer,sizeof(buffer));
-											sprintf(buffer,"-ERR. Debe de introducir el usuario antes que la contraseña\n");
-											send(i,buffer,strlen(buffer),0);
+											enviarMensaje(i,"-ERR. Debe de introducir el usuario antes que la contraseña\n");
 										}
 									}//CIERRE PASSWORD
 
@@ -471,16 +443,11 @@ int main ( )
 
 										bool estado=false;
 
-
-										//bzero(buffer,sizeof(buffer));
-										//sprintf(buffer,"Usuario validado ha entrado en una partida\n");
-										//send(i,buffer,strlen(buffer),0);
+										//enviarMensaje(i,"Usuario validado ha entrado en una partida\n");
 
 										/*
 										if(FD_ISSET(i, &usuario_jugando)){
-										bzero(buffer,sizeof(buffer));
-										sprintf(buffer,"Usuario en estado jugando, por lo tanto no puede iniciar partida\n");
-										send(i,buffer,strlen(buffer),0);
+										enviarMensaje(i,"Usuario en estado jugando, por lo tanto no puede iniciar partida\n");
 										break;
 										}
 
@@ -511,10 +478,8 @@ int main ( )
 														FD_SET(socket1, &usuario_jugando);
 														FD_SET(i, &usuario_jugando);
 
-														bzero(buffer,sizeof(buffer));
-														sprintf(buffer,"+OK. Empieza la partida.\n");
-														send(i, buffer, strlen(buffer), 0);
-														send(socket1 ,buffer,strlen(buffer),0);
+														enviarMensaje(i,"+OK. Empieza la partida.\n");
+														enviarMensaje(socket1,"+OK. Empieza la partida.\n");
 
 														Jugador j1(socket1, &partidas[z]);
 														partidas[z].nuevoJugador(&j1);
@@ -554,15 +519,11 @@ int main ( )
 
 											}
 											else if((partidas.size() == 10) && (partidas.back().getSocket2() != -1)){
-												bzero(buffer,sizeof(buffer));
-												sprintf(buffer,"Demasiadas partidas comenzadas.\n");
-												send(i,buffer,strlen(buffer),0);
+												enviarMensaje(i,"Demasiadas partidas comenzadas.\n");
 											}
 									 }
 										 else{
-											bzero(buffer,sizeof(buffer));
-											sprintf(buffer,"-ERR. Debe introducir usuario y contraseña correctamente para poder jugar\n");
-											send(i,buffer,strlen(buffer),0);
+											enviarMensaje(i,"-ERR. Debe introducir usuario y contraseña correctamente para poder jugar\n");
 										 }
 									  }//CIERRE INICIAR-PARTIDA
 
@@ -593,9 +554,7 @@ int main ( )
 
 
 											if((auxIzquierda == NULL) && ((auxDerecha == NULL))){
-												bzero(buffer,sizeof(buffer));
-												sprintf(buffer,"-ERR. No ha introducido el extremo\n");
-												send(i,buffer,strlen(buffer),0);
+												enviarMensaje(i,"-ERR. No ha introducido el extremo\n");
 												break;
 											}
 
@@ -624,19 +583,15 @@ int main ( )
 													mostrarTableroAJugador(socket1, partidas[idPartida]);
 													mostrarTableroAJugador(socket2, partidas[idPartida]);
 
+													// ----------- FINAL POR QUEDARSE SIN FICHAS -----------
 													if(partidas[idPartida].getJugador(i).nFichas() == 0){
-														bzero(buffer,sizeof(buffer));
-														sprintf(buffer, "\n+OK. Has ganado la partida.\n");
-														send(i,buffer,strlen(buffer),0);
+														enviarMensaje(i, "\n+OK. Ha ganado la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+
 														if(i == socket1){
-															bzero(buffer,sizeof(buffer));
-															sprintf(buffer, "\n+OK. Has perdido la partida.\n");
-															send(socket2,buffer,strlen(buffer),0);
+															enviarMensaje(socket2, "\n+OK. Ha perdido la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
 														}
 														else{
-															bzero(buffer,sizeof(buffer));
-															sprintf(buffer, "\n+OK. Has perdido la partida.\n");
-															send(socket1,buffer,strlen(buffer),0);
+															enviarMensaje(socket1, "\n+OK. Ha perdido la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
 														}
 
 														partidas[idPartida].getJugador(socket1).salirPartida(&partidas[idPartida]);
@@ -661,22 +616,16 @@ int main ( )
 													}
 												}
 												else{
-													bzero(buffer, sizeof(buffer));
-													sprintf(buffer, "-ERR. La ficha no puede ser colocada.\n");
-													send(i, buffer, strlen(buffer), 0);
+													enviarMensaje(i, "-ERR. La ficha no puede ser colocada.\n");
 												}
 											}
 											else{
-												bzero(buffer, sizeof(buffer));
-												sprintf(buffer, "-ERR No es tu turno.\n");
-												send(i, buffer, strlen(buffer), 0);
+												enviarMensaje(i, "-ERR No es tu turno.\n");
 											}
 
 					                   }
 					                   else{
-					                      bzero(buffer,sizeof(buffer));
-																sprintf(buffer, "-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\n");
-					                      send(i,buffer,strlen(buffer),0);
+																enviarMensaje(i, "-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\n");
 					                   }
 					       			}//CIERRE COLOCAR-FICHA
 
@@ -694,9 +643,7 @@ int main ( )
 										if(true){//Quitar esta linea
 											if(i == partidas[idPartida].getTurno()){
 												if(partidas[idPartida].getJugador(i).puedePoner(&partidas[idPartida])){
-													bzero(buffer,sizeof(buffer));
-													sprintf(buffer,"+Ok. No es necesario robar ficha\n");
-													send(i,buffer,strlen(buffer),0);
+													enviarMensaje(i,"+Ok. No es necesario robar ficha\n");
 												}
 												else{
 													if(!partidas[idPartida].montonVacio()){
@@ -711,26 +658,42 @@ int main ( )
 														mostrarManoJugador(partidas[idPartida].getJugador(i), i);
 													}
 													else{
-														bzero(buffer,sizeof(buffer));
-														sprintf(buffer,"+Ok. No quedan fichas en el montón\n");
-														send(i,buffer,strlen(buffer),0);
+														enviarMensaje(i,"+Ok. No quedan fichas en el montón\n");
 
-														decidirTurno(i, socket1, socket2, partidas[idPartida]);
+														// ----------- FINAL POR PUNTOS -----------
+														//Ninguno puede poner ni robar --> Terminamos la partida
+														if((partidas[idPartida].getJugador(socket1).tieneFichas()) && (partidas[idPartida].getJugador(socket2).tieneFichas()) && (!partidas[idPartida].getJugador(socket1).puedePoner(&partidas[idPartida])) && (!partidas[idPartida].getJugador(socket2).puedePoner(&partidas[idPartida]))){
+															if(partidas[idPartida].getJugador(socket1).getPuntos() < partidas[idPartida].getJugador(socket2).getPuntos()){
+																enviarMensaje(socket1, "\n+OK. Ha ganado la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+																enviarMensaje(socket2, "\n+OK. Ha perdido la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+															}
+															else if(partidas[idPartida].getJugador(socket2).getPuntos() < partidas[idPartida].getJugador(socket1).getPuntos()){
+																enviarMensaje(socket2, "\n+OK. Ha ganado la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+																enviarMensaje(socket1, "\n+OK. Ha perdido la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+															}
+															else if(partidas[idPartida].getJugador(socket1).getPuntos() == partidas[idPartida].getJugador(socket2).getPuntos()){
+																enviarMensaje(socket1, "\n+OK. Se acabó la partida. Han empatado a puntos.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+																enviarMensaje(socket2, "\n+OK. Se acabó la partida. Han empatado a puntos.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+															}
+														}
+														//SI no puede poner ni robar, pero el otro jugador sí puede poner --> Pasar turno
+														else if((partidas[idPartida].getJugador(socket1).tieneFichas()) && (partidas[idPartida].getJugador(socket2).tieneFichas()) && (!partidas[idPartida].getJugador(i).puedePoner(&partidas[idPartida])) && (partidas[idPartida].getJugador(otroSocket(i,partidas[idPartida])).puedePoner(&partidas[idPartida]))){
+															enviarMensaje(i,"+Ok. No puede poner fichas ni robar. Pase turno.\n");
+														}
+														else{
+															decidirTurno(i, socket1, socket2, partidas[idPartida]);
+														}
 
 													}
 												}
 											}
 											else{
-												bzero(buffer, sizeof(buffer));
-												sprintf(buffer, "-ERR No es tu turno.\n");
-												send(i, buffer, strlen(buffer), 0);
+												enviarMensaje(i, "-ERR No es tu turno.\n");
 											}
 										}
 
 										else{
-					                      bzero(buffer,sizeof(buffer));
-					                      sprintf(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\n");
-					                      send(i,buffer,strlen(buffer),0);
+					                      enviarMensaje(i,"-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\n");
 					                   }
 
 									}//CIERRE ROBAR-FICHA
@@ -751,26 +714,20 @@ int main ( )
 										if(true){//Quitar esta linea
 											if(i == partidas[idPartida].getTurno()){
 												if((partidas[idPartida].getJugador(i).puedePoner(&partidas[idPartida])) or (!partidas[idPartida].montonVacio())){
-													bzero(buffer,sizeof(buffer));
-													sprintf(buffer,"+Ok. No es necesario pasar turno.\n");
-													send(i,buffer,strlen(buffer),0);
+													enviarMensaje(i,"+Ok. No es necesario pasar turno.\n");
 												}
 												else if((!partidas[idPartida].getJugador(i).puedePoner(&partidas[idPartida])) and (partidas[idPartida].montonVacio())){
 													decidirTurno(i, socket1, socket2, partidas[idPartida]);
 												}
 											}
 											else{
-												bzero(buffer, sizeof(buffer));
-												sprintf(buffer, "-ERR. No es tu turno.\n");
-												send(i, buffer, strlen(buffer), 0);
+												enviarMensaje(i, "-ERR. No es tu turno.\n");
 											}
 										}
 
 										else{
-					                      bzero(buffer,sizeof(buffer));
-					                      sprintf(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede pasar turno\n");
-					                      send(i,buffer,strlen(buffer),0);
-					                   }
+	                      enviarMensaje(i,"-ERR. No esta dentro de una partida por lo tanto no puede pasar turno\n");
+	                   }
 
 									}//CIERRE PASO-TURNO
 
@@ -784,9 +741,8 @@ int main ( )
 										int idPartida, socket1, socket2;
 									 	setIDPartidaySockets(i, partidas, idPartida, socket1, socket2);
 
-
 										if(true){//Quitar esta linea
-											bzero(buffer, sizeof(buffer));
+											bzero(buffer,sizeof(buffer));
 											sprintf(buffer, "PARTIDA %d\n", partidas[idPartida].getJugador(i).getIDPartida());
 											send(i,buffer,strlen(buffer),0);
 										}
@@ -795,9 +751,7 @@ int main ( )
 
 
 									else{
-										bzero(buffer,sizeof(buffer));
-										sprintf(buffer,"-Err. Comando no renococido\n");
-										send(i,buffer,strlen(buffer),0);
+										enviarMensaje(i,"-Err. Comando no renococido\n");
 									}
 								}
 							}
