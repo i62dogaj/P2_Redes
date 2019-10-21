@@ -2,15 +2,7 @@
 #include "partida.hpp"
 using namespace std;
 
-Jugador::Jugador(Partida *p){
-	setManoInicial(p->repartir());
-	//setIDPartida(p->getIDPartida());
-	//setID(p->getNJugadores());
-};
-
 Jugador::Jugador(int id, Partida *p){
-	//setLogin(login);
-	//setPass(pass);
 	setManoInicial(p->repartir());
 	setIDPartida(p->getIDPartida());
 	setID(id);
@@ -19,14 +11,6 @@ Jugador::Jugador(int id, Partida *p){
 
 int Jugador::getID(){
 	return ID_;
-};
-
-string Jugador::getLogin(){
-	return login_;
-};
-
-string Jugador::getPass(){
-	return password_;
 };
 
 int Jugador::getIDPartida(){
@@ -109,15 +93,11 @@ bool Jugador::tieneDobles(){
 Ficha Jugador::dobleMasAlta(){
 	Ficha mayor;
 	mayor = dobles_[0];
-  //mayor.setNI(dobles_[0].getNI());
-  //mayor.setND(dobles_[0].getND());
 	if(nDobles() > 1){
 	  for(int i = 0; i < nDobles(); i++){
 	    //Basta con comprobar uno de los valores
 	    if(mayor.getNI() < dobles_[i].getNI()){
 				mayor = dobles_[i];
-	      //mayor.setNI(dobles_[i].getNI());
-	      //mayor.setND(dobles_[i].getND());
 	    }
 	  }
 	}
@@ -131,15 +111,11 @@ Ficha Jugador::masAlta(){
 	Ficha mayor;
 	int sumaMayor, aux;
 	mayor = mano_[0];
-	//mayor.setNI(mano_[0].getNI());
-	//mayor.setND(mano_[0].getND());
 	sumaMayor = mayor.getNI() + mayor.getND();
 	for(int i = 0; i < mano_.size(); i++){
 		aux = mano_[i].getNI() + mano_[i].getND();
 		if(aux > sumaMayor){
 			mayor = mano_[i];
-			//mayor.setNI(mano_[i].getNI());
-			//mayor.setND(mano_[i].getND());
 			sumaMayor = aux;
 		}
 	}
@@ -168,14 +144,6 @@ void Jugador::setID(int id){
 	ID_ = id;
 };
 
-void Jugador::setLogin(string login){
-	login_ = login;
-};
-
-void Jugador::setPass(string pass){
-	password_ = pass;
-};
-
 void Jugador::setIDPartida(int id){
 	idPartida_ = id;
 };
@@ -201,19 +169,9 @@ void Jugador::girarFicha(Ficha *a){
 
 bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 	int pos;
-	//bool colocada = false;
 	Ficha a(NI,ND);
-	/*do{ // ------ Escogemos la ficha ------
-		cout << "NI: ";
-		cin >> n;
-		a.setNI(n);
-		cout << "ND: ";
-		cin >> n;
-		a.setND(n);
-		if(!existeFicha(a)) cout << "\nEsa ficha no existe en tu montón. \nIntroduce una que sí tengas.\n\n";
-	}while(!existeFicha(a));*/
 	if(!existeFicha(a)){
-		cout << "\nNo existe la ficha.\n";
+		//cout << "\nNo existe la ficha.\n";
 		return false;
 	}
 
@@ -221,7 +179,7 @@ bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 	// ------ Comprobamos que la primera que ponga, si sale él, sea la doble mayor -----
 	if(p->tableroVacio()){
 		if((mano_[pos].getNI() != p->getMasAlta().getNI()) or (mano_[pos].getND() != p->getMasAlta().getND())){
-			cout << "\nPara empezar la partida debe colocar su ficha doble más alta.\n";
+			//cout << "\nPara empezar la partida debe colocar su ficha doble más alta.\n";
 			return false;
 		}
 		else if((mano_[pos].getNI() == p->getMasAlta().getNI()) && (mano_[pos].getND() == p->getMasAlta().getND())){
@@ -230,9 +188,7 @@ bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 			return true;
 		}
 	}
-	else{ // ------ Escogemos el extremo y la colocamos ------
-		//cout << "\n[1] Izquierda    [2] Derecha: ";
-		//cin >> n;
+	else{ // ------ Comprobamos los extremos y la colocamos ------
 		if(extremo == 1){ //Comprobamos los números de los extremos y giramos si hace falta
 			if(p->getExtI() == mano_[pos].getNI()){
 				girarFicha(&mano_[pos]);
@@ -246,7 +202,7 @@ bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 				return true;
 			}
 			else {
-				cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
+				//cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
 				return false;
 			}
 		}
@@ -263,19 +219,11 @@ bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 				return true;
 			}
 			else {
-				cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
+				//cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
 				return false;
 			}
 		}
-		//else return false;
 	}
-	// ------ Eliminamos la ficha de la mano ------
-	/*if(colocada){
-		mano_.erase(mano_.begin()+pos);
-		p->mostrarTablero();
-		return true;
-	}
-	else return false;*/
 };
 
 

@@ -332,7 +332,7 @@ int main ( )
 
 										if (FD_ISSET(i, &usuario_validado)) {
 											bzero(buffer,sizeof(buffer));
-											strcpy(buffer,"-ERR. Usuario en estado validado, no puede inicar sesión\0");
+											strcpy(buffer,"-ERR. Usuario en estado validado, no puede iniciar sesión\0");
 											send(i,buffer,strlen(buffer),0);
 											break;
 										}
@@ -353,7 +353,7 @@ int main ( )
 										for (size_t z = 0; z < usuarios.size(); z++) {
 											if (strcmp(usuarios[z].c_str(), usuario) == 0) {
 												bzero(buffer,sizeof(buffer));
-												strcpy(buffer,"-ERR. Este usuario ya se encuentra logueado en el sistema, no puede inicar sesión\0");
+												strcpy(buffer,"-ERR. Este usuario ya se encuentra logueado en el sistema, no puede iniciar sesión\0");
 												send(i,buffer,strlen(buffer),0);
 												var=true;
 											}
@@ -480,32 +480,13 @@ int main ( )
 										//if(FD_ISSET(i, &usuario_validado)){//Comprobamos si el usuario esta validado para dejar entrar en una partida o no
 										if(true){
 											if(partidas.size() == 0){
-												//inicializar el vector
-												Partida nuevo;
-												nuevo.setSocket1(i);
-												FD_SET(i, &usuario_esperandoPartida);
-												nuevo.setIDPartida(partidas.size());
-												partidas.push_back(nuevo);
-
-												bzero(buffer,sizeof(buffer));
-												strcpy(buffer,"+Ok. Petición Recibida. Quedamos a la espera de más jugadores\0");
-												send(i,buffer,strlen(buffer),0);
+												nuevaPartida(partidas, i, usuario_esperandoPartida);
 											}
 											else if(partidas.size() > 0){
 												for (size_t z = 0; z < partidas.size(); z++) {
 													if((partidas[z].getSocket1() == -1) && (estado == false)){
 														estado = true;
-
-														Partida nuevo;
-														nuevo.setSocket1(i);
-														partidas[z] = nuevo;
-														partidas[z].setIDPartida(z);
-														FD_SET(i, &usuario_esperandoPartida);
-
-														bzero(buffer,sizeof(buffer));
-														strcpy(buffer,"+Ok. Petición Recibida. Quedamos a la espera de más jugadores\0");
-														send(i,buffer,strlen(buffer),0);
-
+														nuevaPartidaEnPos(partidas, i, usuario_esperandoPartida, z);
 													}
 													else if((partidas[z].getSocket2() == -1) && (estado == false)){
 
@@ -529,61 +510,27 @@ int main ( )
 														Jugador j1(socket1, &partidas[z]);
 														partidas[z].nuevoJugador(&j1);
 
-
 														Jugador j2(socket2, &partidas[z]);
 														partidas[z].nuevoJugador(&j2);
 
-
-														bzero(buffer,sizeof(buffer));
-														strcpy(buffer, j1.mostrarMano().c_str());
-														send(socket1,buffer,strlen(buffer),0);
-
-														bzero(buffer,sizeof(buffer));
-														strcpy(buffer, j2.mostrarMano().c_str());
-														send(socket2,buffer,strlen(buffer),0);
-
+														mostrarManoJugador(j1, socket1);
+														mostrarManoJugador(j2, socket2);
 
 
 														fichas[z] = partidas[z].iniciarPartida();
-
 														partidas[z].setMasAlta(fichas[z]);
 
-														bzero(buffer, sizeof(buffer));
+													/*	bzero(buffer, sizeof(buffer));
 														sprintf(buffer, "Partida %d:", partidas[z].getIDPartida());
 														cout << buffer << endl;
 
 														bzero(buffer, sizeof(buffer));
 														sprintf(buffer, "%s\n", fichas[z].mostrarFicha().c_str());
-														cout << buffer << endl << endl;
-
-
-
+														cout << buffer << endl << endl;*/
 
 														//Comprobar quien tiene el doble más alto o la ficha mas mas alta
 														//Y decirle a este que es su turno y al otro que espere
-														if(j1.existeFicha(fichas[z])){
-															partidas[z].setTurno(socket1);
-															bzero(buffer,sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno de partida\n");
-															send(socket1, buffer, strlen(buffer),0);
-
-
-															bzero(buffer,sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno del otro jugador\n");
-															send(socket2, buffer, strlen(buffer),0);
-
-														}
-														else if(j2.existeFicha(fichas[z])){
-															partidas[z].setTurno(socket2);
-															bzero(buffer,sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno de partida\n");
-															send(socket2 ,buffer,strlen(buffer),0);
-
-
-															bzero(buffer,sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno del otro jugador\n");
-															send(socket1 ,buffer,strlen(buffer),0);
-														}
+														decidirTurnoInicial(j1, j2, fichas[z], socket1, socket2, partidas[z]);
 
 													}
 
@@ -591,16 +538,9 @@ int main ( )
 												//FUERA DEL FOR. aqui he recorrido el vector entero y no he encontrado ningun espacio libre en ninguna partida
 
 												if ( (estado == false) && (partidas.size() < MAX_PARTIDAS) ) {
-													Partida nuevo;
-													nuevo.setSocket1(i);
-													FD_SET(i, &usuario_esperandoPartida);
-													nuevo.setIDPartida(partidas.size());
-													partidas.push_back(nuevo);
-
-													bzero(buffer,sizeof(buffer));
-													strcpy(buffer,"+Ok. Petición Recibida. Quedamos a la espera de más jugadores\0");
-													send(i,buffer,strlen(buffer),0);
+													nuevaPartida(partidas, i, usuario_esperandoPartida);
 												}
+
 
 
 											}
@@ -671,10 +611,9 @@ int main ( )
 
 											if(i == partidas[idPartida].getTurno()){
 												if(partidas[idPartida].getJugador(i).colocarFicha(izquierdo, derecho, valorExtremo, &partidas[idPartida]) == true){
-													bzero(buffer,sizeof(buffer));
-													sprintf(buffer, "%s\n", partidas[idPartida].mostrarTablero().c_str());
-													send(socket1,buffer,strlen(buffer),0);
-													send(socket2,buffer,strlen(buffer),0);
+
+													mostrarTableroAJugador(socket1, partidas[idPartida]);
+													mostrarTableroAJugador(socket2, partidas[idPartida]);
 
 													if(partidas[idPartida].getJugador(i).nFichas() == 0){
 														bzero(buffer,sizeof(buffer));
@@ -705,36 +644,11 @@ int main ( )
 													}
 													else{
 
-														bzero(buffer,sizeof(buffer));
-														sprintf(buffer, "%s\n", partidas[idPartida].getJugador(socket1).mostrarMano().c_str());
-														send(socket1,buffer,strlen(buffer),0);
+														mostrarManoJugador(partidas[idPartida].getJugador(socket1), socket1);
+														mostrarManoJugador(partidas[idPartida].getJugador(socket2), socket2);
 
-														bzero(buffer,sizeof(buffer));
-														sprintf(buffer, "%s\n", partidas[idPartida].getJugador(socket2).mostrarMano().c_str());
-														send(socket2,buffer,strlen(buffer),0);
+														decidirTurno(i, socket1, socket2, partidas[idPartida]);
 
-														if(i == socket1){
-															partidas[idPartida].setTurno(socket2);
-
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
-															send(socket1, buffer, strlen(buffer), 0);
-
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno de partida.\n");
-															send(socket2, buffer, strlen(buffer), 0);
-														}
-														else{
-															partidas[idPartida].setTurno(socket1);
-
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
-															send(socket2, buffer, strlen(buffer), 0);
-
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno de partida.\n");
-															send(socket1, buffer, strlen(buffer), 0);
-														}
 													}
 												}
 												else{
@@ -781,45 +695,19 @@ int main ( )
 														a = partidas[idPartida].robar();
 														partidas[idPartida].getJugador(i).robarFicha(a);
 
-														bzero(buffer,sizeof(buffer));
-														sprintf(buffer, "%s\n", a.mostrarFicha().c_str());
-														send(i,buffer,strlen(buffer),0);
+														mostrarFichaRobada(a, i);
 
-														bzero(buffer,sizeof(buffer));
-														sprintf(buffer, "%s\n", partidas[idPartida].mostrarTablero().c_str());
-														send(i,buffer,strlen(buffer),0);
+														mostrarTableroAJugador(i, partidas[idPartida]);
 
-														bzero(buffer,sizeof(buffer));
-														sprintf(buffer, "%s\n", partidas[idPartida].getJugador(i).mostrarMano().c_str());
-														send(i,buffer,strlen(buffer),0);
+														mostrarManoJugador(partidas[idPartida].getJugador(i), i);
 													}
 													else{
 														bzero(buffer,sizeof(buffer));
 														sprintf(buffer,"+Ok. No quedan fichas en el montón\n");
 														send(i,buffer,strlen(buffer),0);
 
-														if(i == socket1){
-															partidas[idPartida].setTurno(socket2);
+														decidirTurno(i, socket1, socket2, partidas[idPartida]);
 
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
-															send(socket1, buffer, strlen(buffer), 0);
-
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno de partida.\n");
-															send(socket2, buffer, strlen(buffer), 0);
-														}
-														else{
-															partidas[idPartida].setTurno(socket1);
-
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
-															send(socket2, buffer, strlen(buffer), 0);
-
-															bzero(buffer, sizeof(buffer));
-															sprintf(buffer, "\n+OK. Turno de partida.\n");
-															send(socket1, buffer, strlen(buffer), 0);
-														}
 													}
 												}
 											}
@@ -859,28 +747,7 @@ int main ( )
 													send(i,buffer,strlen(buffer),0);
 												}
 												else if((!partidas[idPartida].getJugador(i).puedePoner(&partidas[idPartida])) and (partidas[idPartida].montonVacio())){
-													if(i == socket1){
-														partidas[idPartida].setTurno(socket2);
-
-														bzero(buffer, sizeof(buffer));
-														sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
-														send(socket1, buffer, strlen(buffer), 0);
-
-														bzero(buffer, sizeof(buffer));
-														sprintf(buffer, "\n+OK. Turno de partida.\n");
-														send(socket2, buffer, strlen(buffer), 0);
-													}
-													else{
-														partidas[idPartida].setTurno(socket1);
-
-														bzero(buffer, sizeof(buffer));
-														sprintf(buffer, "\n+OK. Turno del otro jugador.\n");
-														send(socket2, buffer, strlen(buffer), 0);
-
-														bzero(buffer, sizeof(buffer));
-														sprintf(buffer, "\n+OK. Turno de partida.\n");
-														send(socket1, buffer, strlen(buffer), 0);
-													}
+													decidirTurno(i, socket1, socket2, partidas[idPartida]);
 												}
 											}
 											else{

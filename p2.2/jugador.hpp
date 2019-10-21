@@ -14,8 +14,6 @@ class Jugador{
 
 	private:
 		int ID_;
-		string login_;
-		string password_;
 		vector <Ficha> mano_;
 		vector <Ficha> dobles_;
 		int idPartida_;
@@ -28,8 +26,6 @@ class Jugador{
 
 		//OBSERVADORES
 		int getID();
-		string getLogin();
-		string getPass();
 		int getIDPartida();
 		int getPuntos();
 		vector<Ficha> getMano();
@@ -47,8 +43,6 @@ class Jugador{
 
 		//MODIFICADORES
 		void setID(int id);
-		void setLogin(string login);
-		void setPass(string pass);
 		void setIDPartida(int id);
 		void setPuntos(int puntos);
 		void setManoInicial(vector <Ficha> vec);
