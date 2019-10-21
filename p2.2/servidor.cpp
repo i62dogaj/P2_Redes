@@ -165,7 +165,7 @@ int main ( )
 										numClientes++;
 										FD_SET(new_sd,&readfds);
 
-										strcpy(buffer, "+Ok. Usuario conectado\n");
+										sprintf(buffer, "+Ok. Usuario conectado\n");
 
 										send(new_sd,buffer,strlen(buffer),0);
 
@@ -178,7 +178,7 @@ int main ( )
 								  }
 								  else{
 										bzero(buffer,sizeof(buffer));
-										strcpy(buffer,"Demasiados clientes conectados\n");
+										sprintf(buffer,"Demasiados clientes conectados\n");
 										send(new_sd,buffer,strlen(buffer),0);
 										close(new_sd);
 								  }
@@ -218,13 +218,22 @@ int main ( )
 									 partidas[idPartida].getJugador(socket2).salirPartida(&partidas[idPartida]);
 									 partidas[idPartida].setSocket1(-1);
 									 partidas[idPartida].setSocket2(-1);
+
 									if(who == socket1){
 										FD_SET(socket2, &usuario_validado);
 										FD_CLR(socket2, &usuario_jugando);
+
+										bzero(buffer,sizeof(buffer));
+										sprintf(buffer,"+OK. Si quiere, puede iniciar otra partida\n");
+										send(socket2,buffer,strlen(buffer),0);
 									}
 									else{
 										FD_SET(socket1, &usuario_validado);
 										FD_CLR(socket1, &usuario_jugando);
+
+										bzero(buffer,sizeof(buffer));
+										sprintf(buffer,"+OK. Si quiere, puede iniciar otra partida\n");
+										send(socket1,buffer,strlen(buffer),0);
 									}
 
 								 }
@@ -240,14 +249,14 @@ int main ( )
 
 										if (FD_ISSET(i, &usuario_correcto)) {
 											bzero(buffer,sizeof(buffer));
-											strcpy(buffer,"-ERR. Usuario en estado correcto, no puede registrarse\0");
+											sprintf(buffer,"-ERR. Usuario en estado correcto, no puede registrarse\n");
 											send(i,buffer,strlen(buffer),0);
 											break;
 										}
 
 										if (FD_ISSET(i, &usuario_validado)) {
 											bzero(buffer,sizeof(buffer));
-											strcpy(buffer,"-ERR. Usuario en estado validado, no puede registrarse\0");
+											sprintf(buffer,"-ERR. Usuario en estado validado, no puede registrarse\n");
 											send(i,buffer,strlen(buffer),0);
 											break;
 										}
@@ -279,12 +288,12 @@ int main ( )
 										//Si no se encuentra ocurrencia con -u ó -p en el mensaje del cliente
 										if((auxUser1 == NULL) or ((auxPasswd1 == NULL))){
 											bzero(buffer,sizeof(buffer));
-											strcpy(buffer,"-ERR. Sentencia de registro incorrecta\0");
+											sprintf(buffer,"-ERR. Sentencia de registro incorrecta\n");
 											send(i,buffer,strlen(buffer),0);
 											break;
 										}
 
-										//Con estos -1 quitamos los '\0' || lenght_aux_user2 -> Tamaño desde " -p" hasta el final del buffer
+										//Con estos -1 quitamos los '\n' || lenght_aux_user2 -> Tamaño desde " -p" hasta el final del buffer
 										int tamBuffer=strlen(buffer)-1, tamAuxUser2=strlen(auxUser2)-1, tamAuxPasswd1=strlen(auxPasswd1)-1;
 
 										strncpy(usuario, auxUser1+3, tamBuffer-tamAuxUser2-12);//metemos en user, desde esa posicion, un numero x de bytes
@@ -301,7 +310,7 @@ int main ( )
 											{
 												anadir=false;
 												bzero(buffer,sizeof(buffer));
-												strcpy(buffer,"-ERR. Usuario existente\0");
+												sprintf(buffer,"-ERR. Usuario existente\n");
 												send(i,buffer,strlen(buffer),0);
 												break;
 											}
@@ -317,7 +326,7 @@ int main ( )
 										{
 											file << usuario << " " << contrasena << "\n";
 											bzero(buffer,sizeof(buffer));
-											strcpy(buffer,"+Ok. Usuario Registrado\0");
+											sprintf(buffer,"+Ok. Usuario Registrado\n");
 											send(i,buffer,strlen(buffer),0);
 										}
 										file.close();
@@ -332,7 +341,7 @@ int main ( )
 
 										if (FD_ISSET(i, &usuario_validado)) {
 											bzero(buffer,sizeof(buffer));
-											strcpy(buffer,"-ERR. Usuario en estado validado, no puede iniciar sesión\0");
+											sprintf(buffer,"-ERR. Usuario en estado validado, no puede iniciar sesión\n");
 											send(i,buffer,strlen(buffer),0);
 											break;
 										}
@@ -353,7 +362,7 @@ int main ( )
 										for (size_t z = 0; z < usuarios.size(); z++) {
 											if (strcmp(usuarios[z].c_str(), usuario) == 0) {
 												bzero(buffer,sizeof(buffer));
-												strcpy(buffer,"-ERR. Este usuario ya se encuentra logueado en el sistema, no puede iniciar sesión\0");
+												sprintf(buffer,"-ERR. Este usuario ya se encuentra logueado en el sistema, no puede iniciar sesión\n");
 												send(i,buffer,strlen(buffer),0);
 												var=true;
 											}
@@ -383,7 +392,7 @@ int main ( )
 											   									//al conjunto de sockets usuarios_correctos
 
 										     bzero(buffer,sizeof(buffer));
-										     strcpy(buffer,"+OK. Usuario correcto\0");
+										     sprintf(buffer,"+OK. Usuario correcto\n");
 										     send(i,buffer,strlen(buffer),0);
 										     file.close();
 										     break;
@@ -392,7 +401,7 @@ int main ( )
 
 										if(!pedirContrasena){
 										  bzero(buffer,sizeof(buffer));
-										  strcpy(buffer,"-ERR. Usuario incorrecto\0");
+										  sprintf(buffer,"-ERR. Usuario incorrecto\n");
 										  send(i,buffer,strlen(buffer),0);
 										  file.close();
 										}
@@ -429,7 +438,7 @@ int main ( )
 																								//porque ahora pertenece al conjunto de usuarios validados
 
 											         bzero(buffer,sizeof(buffer)); //a partir de aqui pasamos informacion al usuario
-											         strcpy(buffer,"+Ok. Usuario validado\0");
+											         sprintf(buffer,"+Ok. Usuario validado\n");
 											         send(i,buffer,strlen(buffer),0);
 
 											         file.close();
@@ -437,7 +446,7 @@ int main ( )
 											      }
 											      else{
 											         bzero(buffer,sizeof(buffer));
-											         strcpy(buffer,"-ERR. Error en la validación\0");
+											         sprintf(buffer,"-ERR. Error en la validación\n");
 											         send(i,buffer,strlen(buffer),0);
 											         file.close();
 											         break;
@@ -449,7 +458,7 @@ int main ( )
 									  //En caso de introducir el password antes que el usuario
 										else{
 											bzero(buffer,sizeof(buffer));
-											strcpy(buffer,"-ERR. Debe de introducir el usuario antes que la contraseña\0");
+											sprintf(buffer,"-ERR. Debe de introducir el usuario antes que la contraseña\n");
 											send(i,buffer,strlen(buffer),0);
 										}
 									}//CIERRE PASSWORD
@@ -464,13 +473,13 @@ int main ( )
 
 
 										//bzero(buffer,sizeof(buffer));
-										//strcpy(buffer,"Usuario validado ha entrado en una partida\0");
+										//sprintf(buffer,"Usuario validado ha entrado en una partida\n");
 										//send(i,buffer,strlen(buffer),0);
 
 										/*
 										if(FD_ISSET(i, &usuario_jugando)){
 										bzero(buffer,sizeof(buffer));
-										strcpy(buffer,"Usuario en estado jugando, por lo tanto no puede iniciar partida\0");
+										sprintf(buffer,"Usuario en estado jugando, por lo tanto no puede iniciar partida\n");
 										send(i,buffer,strlen(buffer),0);
 										break;
 										}
@@ -486,7 +495,7 @@ int main ( )
 												for (size_t z = 0; z < partidas.size(); z++) {
 													if((partidas[z].getSocket1() == -1) && (estado == false)){
 														estado = true;
-														nuevaPartidaEnPos(partidas, i, usuario_esperandoPartida, z);
+														nuevaPartidaEnPosicion(partidas, i, usuario_esperandoPartida, z);
 													}
 													else if((partidas[z].getSocket2() == -1) && (estado == false)){
 
@@ -503,7 +512,7 @@ int main ( )
 														FD_SET(i, &usuario_jugando);
 
 														bzero(buffer,sizeof(buffer));
-														strcpy(buffer,"+OK. Empieza la partida.\0");
+														sprintf(buffer,"+OK. Empieza la partida.\n");
 														send(i, buffer, strlen(buffer), 0);
 														send(socket1 ,buffer,strlen(buffer),0);
 
@@ -546,13 +555,13 @@ int main ( )
 											}
 											else if((partidas.size() == 10) && (partidas.back().getSocket2() != -1)){
 												bzero(buffer,sizeof(buffer));
-												strcpy(buffer,"Demasiadas partidas comenzadas.\n");
+												sprintf(buffer,"Demasiadas partidas comenzadas.\n");
 												send(i,buffer,strlen(buffer),0);
 											}
 									 }
 										 else{
 											bzero(buffer,sizeof(buffer));
-											strcpy(buffer,"-ERR. Debe introducir usuario y contraseña correctamente para poder jugar\0");
+											sprintf(buffer,"-ERR. Debe introducir usuario y contraseña correctamente para poder jugar\n");
 											send(i,buffer,strlen(buffer),0);
 										 }
 									  }//CIERRE INICIAR-PARTIDA
@@ -585,7 +594,7 @@ int main ( )
 
 											if((auxIzquierda == NULL) && ((auxDerecha == NULL))){
 												bzero(buffer,sizeof(buffer));
-												strcpy(buffer,"-ERR. No ha introducido el extremo\0");
+												sprintf(buffer,"-ERR. No ha introducido el extremo\n");
 												send(i,buffer,strlen(buffer),0);
 												break;
 											}
@@ -666,7 +675,7 @@ int main ( )
 					                   }
 					                   else{
 					                      bzero(buffer,sizeof(buffer));
-					                      strcpy(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\0");
+																sprintf(buffer, "-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\n");
 					                      send(i,buffer,strlen(buffer),0);
 					                   }
 					       			}//CIERRE COLOCAR-FICHA
@@ -720,7 +729,7 @@ int main ( )
 
 										else{
 					                      bzero(buffer,sizeof(buffer));
-					                      strcpy(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\0");
+					                      sprintf(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\n");
 					                      send(i,buffer,strlen(buffer),0);
 					                   }
 
@@ -759,7 +768,7 @@ int main ( )
 
 										else{
 					                      bzero(buffer,sizeof(buffer));
-					                      strcpy(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede pasar turno\0");
+					                      sprintf(buffer,"-ERR. No esta dentro de una partida por lo tanto no puede pasar turno\n");
 					                      send(i,buffer,strlen(buffer),0);
 					                   }
 
@@ -787,7 +796,7 @@ int main ( )
 
 									else{
 										bzero(buffer,sizeof(buffer));
-										strcpy(buffer,"-Err. Comando no renococido\0");
+										sprintf(buffer,"-Err. Comando no renococido\n");
 										send(i,buffer,strlen(buffer),0);
 									}
 								}
