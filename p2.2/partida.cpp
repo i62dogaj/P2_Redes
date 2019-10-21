@@ -272,12 +272,14 @@ void Partida::menosNJugadores(){
 };
 
 void Partida::nuevoJugador(Jugador *j){
+	bool introducido = false;
   jugadores_.push_back(*j);
   masNJugadores();
   if(getSocket1() == -1){
     setSocket1(j->getID());
+		introducido = true;
   }
-  else if(getSocket2() == -1){
+  else if((introducido == false) && (getSocket2() == -1)){
     setSocket2(j->getID());
   }
 };
@@ -320,6 +322,10 @@ void Partida::setSocket2(int socket){
 
 void Partida::setTurno(int turno){
    turno_ = turno;
+};
+
+void Partida::vaciarJugadores(){
+	jugadores_.clear();
 };
 
 

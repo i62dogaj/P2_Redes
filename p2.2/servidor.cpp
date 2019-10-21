@@ -14,6 +14,7 @@
 #include <fstream>
 #include "partida.hpp"
 #include "jugador.hpp"
+#include "funciones.hpp"
 
 
 #define MSG_SIZE 250
@@ -23,10 +24,6 @@
 /*
  * El servidor ofrece el servicio de un chat
  */
-
-void manejador(int signum);
-void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]);
-
 
 
 int main ( )
@@ -207,19 +204,13 @@ int main ( )
 										 int who = i;
 										 salirCliente(i,&readfds,&numClientes,arrayClientes);
 
-										 int idPartida;
-										 for(int z = 0; z < partidas.size(); z++){
-											 if((partidas[z].getSocket1() == i) || (partidas[z].getSocket2() == i)){
-												 idPartida = z;
-											 }
-										 }
+										 int idPartida, socket1, socket2;
+										 setIDPartidaySockets(i, partidas, idPartida, socket1, socket2);
 
-										int socket1 = partidas[idPartida].getSocket1();
-										int socket2 = partidas[idPartida].getSocket2();
-
-										partidas[idPartida].setSocket1(-1);
-										partidas[idPartida].setSocket2(-1);
-
+										 partidas[idPartida].getJugador(socket1).salirPartida(&partidas[idPartida]);
+										 partidas[idPartida].getJugador(socket2).salirPartida(&partidas[idPartida]);
+										 partidas[idPartida].setSocket1(-1);
+										 partidas[idPartida].setSocket2(-1);
 										if(who == socket1){
 											FD_SET(socket2, &usuario_validado);
 											FD_CLR(socket2, &usuario_jugando);
@@ -479,6 +470,7 @@ int main ( )
 															Partida nuevo;
 															nuevo.setSocket1(i);
 															partidas[z] = nuevo;
+															partidas[z].setIDPartida(z);
 															FD_SET(i, &usuario_esperandoPartida);
 
 															bzero(buffer,sizeof(buffer));
@@ -527,7 +519,15 @@ int main ( )
 
 															partidas[z].setMasAlta(fichas[z]);
 
-															//fichas.insert(z, partidas[z].iniciarPartida());
+															bzero(buffer, sizeof(buffer));
+															sprintf(buffer, "Partida %d:", partidas[z].getIDPartida());
+															cout << buffer << endl;
+
+															bzero(buffer, sizeof(buffer));
+															sprintf(buffer, "%s\n", fichas[z].mostrarFicha().c_str());
+															cout << buffer << endl << endl;
+
+
 
 
 															//Comprobar quien tiene el doble más alto o la ficha mas mas alta
@@ -565,6 +565,7 @@ int main ( )
 														Partida nuevo;
 														nuevo.setSocket1(i);
 														FD_SET(i, &usuario_esperandoPartida);
+														nuevo.setIDPartida(partidas.size());
 														partidas.push_back(nuevo);
 
 														bzero(buffer,sizeof(buffer));
@@ -579,6 +580,7 @@ int main ( )
 													Partida nuevo;
 													nuevo.setSocket1(i);
 													FD_SET(i, &usuario_esperandoPartida);
+													nuevo.setIDPartida(partidas.size());
 													partidas.push_back(nuevo);
 
 													bzero(buffer,sizeof(buffer));
@@ -642,18 +644,11 @@ int main ( )
 												//El ahorcamiento por aqui y así queda todo bien ordenadito
 
 
-												int idPartida;
-												for(int z = 0; z < partidas.size(); z++){
-													if((partidas[z].getSocket1() == i) || (partidas[z].getSocket2() == i)){
-														idPartida = z;
-													}
-												}
-
-												int socket1 = partidas[idPartida].getSocket1();
-												int socket2 = partidas[idPartida].getSocket2();
+												int idPartida, socket1, socket2;
+	 										 	setIDPartidaySockets(i, partidas, idPartida, socket1, socket2);
 
 												if(i == partidas[idPartida].getTurno()){
-													if(partidas[idPartida].getJugador(i).colocarFicha(izquierdo, derecho, valorExtremo, &partidas[idPartida])){
+													if(partidas[idPartida].getJugador(i).colocarFicha(izquierdo, derecho, valorExtremo, &partidas[idPartida]) == true){
 														bzero(buffer,sizeof(buffer));
 														sprintf(buffer, "%s\n", partidas[idPartida].mostrarTablero().c_str());
 														send(socket1,buffer,strlen(buffer),0);
@@ -674,6 +669,8 @@ int main ( )
 																send(socket1,buffer,strlen(buffer),0);
 															}
 
+															partidas[idPartida].getJugador(socket1).salirPartida(&partidas[idPartida]);
+				 										 	partidas[idPartida].getJugador(socket2).salirPartida(&partidas[idPartida]);
 															partidas[idPartida].setSocket1(-1);
 															partidas[idPartida].setSocket2(-1);
 
@@ -682,6 +679,7 @@ int main ( )
 
 															FD_CLR(socket1, &usuario_jugando);
 															FD_CLR(socket2, &usuario_jugando);
+
 														}
 														else{
 
@@ -729,10 +727,6 @@ int main ( )
 													send(i, buffer, strlen(buffer), 0);
 												}
 
-
-
-
-
 		                           }
 		                           else{
 		                              bzero(buffer,sizeof(buffer));
@@ -749,15 +743,8 @@ int main ( )
 
 											//if(FD_ISSET(i, &usuario_jugando)){
 
-											int idPartida;
-											for(int z = 0; z < partidas.size(); z++){
-												if((partidas[z].getSocket1() == i) || (partidas[z].getSocket2() == i)){
-													idPartida = z;
-												}
-											}
-
-											int socket1 = partidas[idPartida].getSocket1();
-											int socket2 = partidas[idPartida].getSocket2();
+											int idPartida, socket1, socket2;
+ 										 	setIDPartidaySockets(i, partidas, idPartida, socket1, socket2);
 
 
 
@@ -845,15 +832,8 @@ int main ( )
 											send(i,buffer,strlen(buffer),0);
 											*/
 
-											int idPartida;
-											for(int z = 0; z < partidas.size(); z++){
-												if((partidas[z].getSocket1() == i) || (partidas[z].getSocket2() == i)){
-													idPartida = z;
-												}
-											}
-
-											int socket1 = partidas[idPartida].getSocket1();
-											int socket2 = partidas[idPartida].getSocket2();
+											int idPartida, socket1, socket2;
+ 										 	setIDPartidaySockets(i, partidas, idPartida, socket1, socket2);
 
 
 											if(true){
@@ -903,6 +883,25 @@ int main ( )
 
 										}//CIERRE PASO-TURNO
 
+										/*-----------------------------------------------------------------------
+										IDPARTIDA
+										------------------------------------------------------------------------ */
+										else if(strcmp(buffer, "IDPARTIDA\n")==0){
+
+											//if(FD_ISSET(i, &usuario_jugando)){
+
+											int idPartida, socket1, socket2;
+ 										 	setIDPartidaySockets(i, partidas, idPartida, socket1, socket2);
+
+
+											if(true){
+												bzero(buffer, sizeof(buffer));
+												sprintf(buffer, "PARTIDA %d\n", partidas[idPartida].getJugador(i).getIDPartida());
+												send(i,buffer,strlen(buffer),0);
+											}
+
+										}//CIERRE IDPARTIDA
+
 
 										else{
 											bzero(buffer,sizeof(buffer));
@@ -927,39 +926,4 @@ int main ( )
 	close(sd);
 	return 0;
 
-}
-
-void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]){
-
-    char buffer[250];
-    int j;
-
-    close(socket);
-    FD_CLR(socket,readfds);
-
-    //Re-estructurar el array de clientes
-    for (j = 0; j < (*numClientes) - 1; j++)
-        if (arrayClientes[j] == socket)
-            break;
-    for (; j < (*numClientes) - 1; j++)
-        (arrayClientes[j] = arrayClientes[j+1]);
-
-    (*numClientes)--;
-
-    bzero(buffer,sizeof(buffer));
-    sprintf(buffer,"Desconexión del cliente: %d\n",socket);
-
-    for(j=0; j<(*numClientes); j++)
-        if(arrayClientes[j] != socket)
-            send(arrayClientes[j],buffer,strlen(buffer),0);
-
-
-}
-
-
-void manejador (int signum){
-    printf("\nSe ha recibido la señal sigint\n");
-    //signal(SIGINT,manejador);
-
-    //Implementar lo que se desee realizar cuando ocurra la excepción de ctrl+c en el servidor
 }

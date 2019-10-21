@@ -213,6 +213,7 @@ bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 		if(!existeFicha(a)) cout << "\nEsa ficha no existe en tu montón. \nIntroduce una que sí tengas.\n\n";
 	}while(!existeFicha(a));*/
 	if(!existeFicha(a)){
+		cout << "\nNo existe la ficha.\n";
 		return false;
 	}
 
@@ -220,7 +221,7 @@ bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 	// ------ Comprobamos que la primera que ponga, si sale él, sea la doble mayor -----
 	if(p->tableroVacio()){
 		if((mano_[pos].getNI() != p->getMasAlta().getNI()) or (mano_[pos].getND() != p->getMasAlta().getND())){
-			//cout << "\nPara empezar la partida debe colocar su ficha doble más alta.\n";
+			cout << "\nPara empezar la partida debe colocar su ficha doble más alta.\n";
 			return false;
 		}
 		else if((mano_[pos].getNI() == p->getMasAlta().getNI()) && (mano_[pos].getND() == p->getMasAlta().getND())){
@@ -245,7 +246,7 @@ bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 				return true;
 			}
 			else {
-				//cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
+				cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
 				return false;
 			}
 		}
@@ -262,11 +263,11 @@ bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 				return true;
 			}
 			else {
-				//cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
+				cout << "\nEsta ficha no se puede colocar en este extremo. \nEscoge otra ficha, otro extremo o roba.\n\n";
 				return false;
 			}
 		}
-		else return false;
+		//else return false;
 	}
 	// ------ Eliminamos la ficha de la mano ------
 	/*if(colocada){
@@ -279,12 +280,9 @@ bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 
 
 void Jugador::salirPartida(Partida *p){
-	p->menosNJugadores();
-	setIDPartida(-1);
 	if(!mano_.empty()){
-		/*for(int i = 0; i < mano_.size(); i++){
-			p->anadirFichaMonton(mano_[i]);
-		}*/
 		mano_.clear();
 	}
+	 if(p->getNJugadores() != 0) p->vaciarJugadores();
+	 p->menosNJugadores();
 };
