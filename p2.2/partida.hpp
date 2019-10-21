@@ -33,7 +33,6 @@ class Partida{
 
     //OBSERVADORES
     int getIDPartida();
-	  int getIDJugador(string login);
     int getNJugadores();
     int getExtI();
     int getExtD();
@@ -46,7 +45,7 @@ class Partida{
     bool tableroVacio();
     bool montonVacio();
     bool buscarFichaMonton(Ficha a);
-    string mostrarMonton();
+    //string mostrarMonton();
     string mostrarTablero();
 
     int getSocket1();

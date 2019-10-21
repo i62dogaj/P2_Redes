@@ -3,7 +3,6 @@
 using namespace std;
 
 Partida::Partida(){ //Generamos todas las fichas sin repetirlas
-  //setIDPartida(id);
   setNJugadores(0);
   socket1_ = -1;
   socket2_ = -1;
@@ -22,13 +21,6 @@ Partida::Partida(){ //Generamos todas las fichas sin repetirlas
 
 int Partida::getIDPartida(){
 	return idPartida_;
-};
-
-int Partida::getIDJugador(string login){
-	for(int i = 0; i < jugadores_.size(); i++){
-		if(jugadores_[i].getLogin() == login) return i;
-	}
-   return 100000;
 };
 
 int Partida::getNJugadores(){
@@ -108,17 +100,13 @@ Ficha Partida::iniciarPartida(){
 			fflush(stdout);
 			fDobles_[i].mostrarFicha();
 		}*/
-    masAlta_ = fDobles_[0];
-	 // masAlta_.setNI(fDobles_[0].getNI());
-	  //masAlta_.setND(fDobles_[0].getND());
+    setMasAlta(fDobles_[0]);
 	  pos = 0;
 		if(fDobles_.size() > 1){
 		  for(int i = 0; i < fDobles_.size(); i++){
 		    //Basta con comprobar uno de los valores
 		    if(masAlta_.getNI() < fDobles_[i].getNI()){
-          masAlta_ = fDobles_[i];
-		      //masAlta_.setNI(fDobles_[i].getNI());
-		      //masAlta_.setND(fDobles_[i].getND());
+          setMasAlta(fDobles_[i]);
 		      pos = i;
 		    }
 		  }
@@ -149,17 +137,13 @@ Ficha Partida::iniciarPartida(){
 			fflush(stdout);
 			fMayores_[i].mostrarFicha();
 		}*/
-    masAlta_ = fMayores_[0];
-	  //masAlta_.setNI(fMayores_[0].getNI());
-	  //masAlta_.setND(fMayores_[0].getND());
+    setMasAlta(fMayores_[0]);
 		sumaMayor = fMayores_[0].getNI() + fMayores_[0].getND();
 	  pos = 0;
 	  for(int i = 0; i < fMayores_.size(); i++){
 	    aux = fMayores_[i].getNI() + fMayores_[i].getND();
 	    if(aux > sumaMayor){
-        masAlta_ = fMayores_[i];
-	      //masAlta_.setNI(fMayores_[i].getNI());
-	      //masAlta_.setND(fMayores_[i].getND());
+        setMasAlta(fMayores_[i]);
 				sumaMayor = aux;
 	      pos = i;
 	    }
@@ -167,7 +151,7 @@ Ficha Partida::iniciarPartida(){
 	}
 	/* Devolvemos la ficha mayor, doble o no, y los jugadores_
      comprobarán si la tienen, comenzando aquel que la tenga.*/
-	return masAlta_;
+	return getMasAlta();
 };
 
 bool Partida::tableroVacio(){
@@ -189,7 +173,7 @@ bool Partida::buscarFichaMonton(Ficha a){
 	return false;
 };
 
-string Partida::mostrarMonton(){
+/*string Partida::mostrarMonton(){
   char cad[250], I[10], D[10];
   if(montonVacio()){
     //cout << "Aún no hay fichas en el tablero.\n";
@@ -210,7 +194,7 @@ string Partida::mostrarMonton(){
   }
   string cadena(cad);
   return cadena;
-};
+};*/
 
 string Partida::mostrarTablero(){
   char cad[250], I[10], D[10];
