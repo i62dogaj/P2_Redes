@@ -7,6 +7,8 @@
 #include <string>
 #include <cstring>
 #include <iostream>
+#include <stdlib.h>
+#include <signal.h>
 
 void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]){
 
@@ -31,16 +33,6 @@ void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClie
     for(j=0; j<(*numClientes); j++)
         if(arrayClientes[j] != socket)
             send(arrayClientes[j],buffer,strlen(buffer),0);
-
-
-}
-
-
-void manejador (int signum){
-    printf("\nSe ha recibido la señal sigint\n");
-    //signal(SIGINT,manejador);
-
-    //Implementar lo que se desee realizar cuando ocurra la excepción de ctrl+c en el servidor
 }
 
 void setIDPartidaySockets(int &i, std::vector<Partida> &partidas, int &idPartida, int &socket1, int &socket2){
