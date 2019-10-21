@@ -18,7 +18,8 @@
 
 
 #define MSG_SIZE 250
-#define MAX_CLIENTS 50
+#define MAX_CLIENTS 30
+#define MAX_PARTIDAS 10
 
 
 /*
@@ -461,8 +462,19 @@ int main ( )
 	                              //send(i,buffer,strlen(buffer),0);
 
 											if(true){
+												if(partidas.size() == 0){
+													//inicializar el vector
+													Partida nuevo;
+													nuevo.setSocket1(i);
+													FD_SET(i, &usuario_esperandoPartida);
+													nuevo.setIDPartida(partidas.size());
+													partidas.push_back(nuevo);
 
-												if(partidas.size()>0){
+													bzero(buffer,sizeof(buffer));
+													strcpy(buffer,"+Ok. Petición Recibida. Quedamos a la espera de más jugadores\0");
+													send(i,buffer,strlen(buffer),0);
+												}
+												else if(partidas.size() > 0){
 													for (size_t z = 0; z < partidas.size(); z++) {
 														if((partidas[z].getSocket1() == -1) && (estado == false)){
 															estado = true;
@@ -561,7 +573,7 @@ int main ( )
 													}
 													//FUERA DEL FOR. aqui he recorrido el vector entero y no he encontrado ningun espacio libre en ninguna partida
 
-													if ( (estado == false) && (partidas.size() < 10) ) {
+													if ( (estado == false) && (partidas.size() < MAX_PARTIDAS) ) {
 														Partida nuevo;
 														nuevo.setSocket1(i);
 														FD_SET(i, &usuario_esperandoPartida);
@@ -575,25 +587,18 @@ int main ( )
 
 
 												}
-												else{
-													//inicializar el vector
-													Partida nuevo;
-													nuevo.setSocket1(i);
-													FD_SET(i, &usuario_esperandoPartida);
-													nuevo.setIDPartida(partidas.size());
-													partidas.push_back(nuevo);
-
+												else if((partidas.size() == 10) && (partidas.back().getSocket2() != -1)){
 													bzero(buffer,sizeof(buffer));
-													strcpy(buffer,"+Ok. Petición Recibida. Quedamos a la espera de más jugadores\0");
+													strcpy(buffer,"Demasiados partidas comenzadas.\n");
 													send(i,buffer,strlen(buffer),0);
 												}
-		                           }
-		                           else{
-		                              bzero(buffer,sizeof(buffer));
-		                              strcpy(buffer,"-ERR. Debe introducir usuario y contraseña correctamente para poder jugar\0");
-		                              send(i,buffer,strlen(buffer),0);
-		                           }
-		                        }//CIERRE INICIAR-PARTIDA
+                     }
+		                 else{
+		                    bzero(buffer,sizeof(buffer));
+		                    strcpy(buffer,"-ERR. Debe introducir usuario y contraseña correctamente para poder jugar\0");
+		                    send(i,buffer,strlen(buffer),0);
+		                 }
+		              }//CIERRE INICIAR-PARTIDA
 
 
 										/*-----------------------------------------------------------------------
