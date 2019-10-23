@@ -74,6 +74,18 @@ class Partida{
     void setTurno(int turno);
 
 		void vaciarJugadores();
+  /*  void limpiarMonton(vector<int> &contadorFichas){
+      for (size_t i = 0; i < monton_.size(); i++) {
+        if(monton_[i].getNI() == monton_[i].getND()){
+          contadorFichas[monton_[i].getNI()]++;
+        }
+        else{
+          contadorFichas[monton_[i].getNI()]++;
+          contadorFichas[monton_[i].getND()]++;
+        }
+      }
+      monton_.clear();
+    };*/
 
 
     //OPERADORES DE ASIGNACIÓN
