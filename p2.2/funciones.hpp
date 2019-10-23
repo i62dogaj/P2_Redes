@@ -1,6 +1,13 @@
 #ifndef FUNCIONES_HPP
 #define FUNCIONES_HPP
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <vector>
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -9,6 +16,9 @@
 #include <iostream>
 #include <stdlib.h>
 #include <signal.h>
+#include "ficha.hpp"
+#include "partida.hpp"
+#include "jugador.hpp"
 
 void enviarMensaje(int socket, const char *cadena){
 	char buffer[250];
@@ -181,6 +191,18 @@ void lanzarPartida(Partida &p, Ficha &a, int i, fd_set usuario_esperandoPartida,
 	//Y decirle a este que es su turno y al otro que espere
 	decidirTurnoInicial(j1, j2, a, socket1, socket2, p);
 }
+
+
+bool hayHueco(int nPartidas, vector<Partida> &partidas){
+	for (size_t z = 0; z < partidas.size(); z++) {
+		if(partidas[z].getSocket2() == -1){
+			cout << "Hay hueco\n";
+			return true;
+		}
+	}
+	cout << "No hay hueco\n";
+	return false;
+};
 
 
 

@@ -74,7 +74,6 @@ class Partida{
     void setTurno(int turno);
 
 		void vaciarJugadores();
-    void limpiarMonton(){monton_.clear();};
 
 
     //OPERADORES DE ASIGNACIÓN

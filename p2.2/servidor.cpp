@@ -27,7 +27,7 @@ void manejador(int sigsum){
 
 #define MSG_SIZE 250
 #define MAX_CLIENTS 30
-#define MAX_PARTIDAS 10
+#define MAX_PARTIDAS 2
 
 
 /*
@@ -459,8 +459,8 @@ int main ( )
 												nuevaPartida(nPartidas, partidas, i, usuario_esperandoPartida);
 											}
 											else if(nPartidas > 0){
-                        if (nPartidas < MAX_PARTIDAS) {
-                          for (size_t z = 0; z < nPartidas; z++) {
+                        if (nPartidas <= MAX_PARTIDAS) {
+                          for (size_t z = 0; z < partidas.size(); z++) {
   													if((partidas[z].getSocket1() == -1) && (estado == false)){
   														estado = true;
   														nuevaPartidaEnPosicion(nPartidas, partidas, i, usuario_esperandoPartida, z);
@@ -471,19 +471,18 @@ int main ( )
   													}
   												}
                           // Si no ha encontrado ningún hueco en ninguna partida, crea una nueva.
-                          if(estado == false){
+                          if((nPartidas != MAX_PARTIDAS) && (estado == false)){
+                            estado = true;
     												nuevaPartida(nPartidas, partidas, i, usuario_esperandoPartida);
     											}
   											}
-                        else if((nPartidas == 10) && (partidas.back().getSocket2() == -1)){
-                          estado=true;
-                          lanzarPartida(partidas.back(), fichas[9], i, usuario_esperandoPartida, usuario_jugando);
-  											}
-                        else if((nPartidas == 10) && (partidas.back().getSocket2() != -1)){
+                        if((nPartidas == MAX_PARTIDAS) && (estado == false) && (!hayHueco(nPartidas, partidas))){
   												enviarMensaje(i,"Demasiadas partidas comenzadas.\n");
   											}
 												//FUERA DEL FOR. aqui he recorrido el vector entero y no he encontrado ningun espacio libre en ninguna partida
 											}
+
+
 									 }
 										 else{
 											enviarMensaje(i,"-ERR. Debe introducir usuario y contraseña correctamente para poder jugar\n");
