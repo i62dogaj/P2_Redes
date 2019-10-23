@@ -93,10 +93,9 @@ void decidirTurno(int i, int socket1, int socket2, Partida &p){
 }
 
 
-void nuevaPartida(int &nPartidas, vector<Partida> &partidas, int i, fd_set usuario_esperandoPartida){
+void nuevaPartida(int &nPartidas, vector<Partida> &partidas, int i){
 		Partida nuevo;
 		nuevo.setSocket1(i);
-		FD_SET(i, &usuario_esperandoPartida);
 		nuevo.setIDPartida(partidas.size());
 		partidas.push_back(nuevo);
 		nPartidas++;
@@ -104,10 +103,9 @@ void nuevaPartida(int &nPartidas, vector<Partida> &partidas, int i, fd_set usuar
 		enviarMensaje(i,"+Ok. Petición Recibida. Quedamos a la espera de más jugadores\0");
 }
 
-void nuevaPartidaEnPosicion(int &nPartidas, vector<Partida> &partidas, int i, fd_set usuario_esperandoPartida, int pos){
+void nuevaPartidaEnPosicion(int &nPartidas, vector<Partida> &partidas, int i, int pos){
 		Partida nuevo;
 		nuevo.setSocket1(i);
-		FD_SET(i, &usuario_esperandoPartida);
 		partidas[pos] = nuevo;
 		partidas[pos].setIDPartida(pos);
 		nPartidas++;
@@ -152,16 +150,11 @@ int otroSocket(int socket, Partida &p){
 
 
 
-void lanzarPartida(Partida &p, Ficha &a, int i, fd_set usuario_esperandoPartida, fd_set usuario_jugando){
+void lanzarPartida(Partida &p, Ficha &a, int i){
 	int socket1=p.getSocket1();
 
 	p.setSocket2(i);
 	int socket2=p.getSocket2();
-
-
-	FD_CLR(socket1, &usuario_esperandoPartida);
-	FD_SET(socket1, &usuario_jugando);
-	FD_SET(i, &usuario_jugando);
 
 	enviarMensaje(i,"+OK. Empieza la partida.\n");
 	enviarMensaje(socket1,"+OK. Empieza la partida.\n");
@@ -203,6 +196,43 @@ bool hayHueco(int nPartidas, vector<Partida> &partidas){
 	cout << "No hay hueco\n";
 	return false;
 };
+
+
+void salirAmbos(Partida &p, int socket1, int socket2, int &nPartidas){
+	p.getJugador(socket1).salirPartida(&p);
+	p.getJugador(socket2).salirPartida(&p);
+	p.setSocket1(-1);
+	p.setSocket2(-1);
+	nPartidas--;
+}
+
+
+void saberGanadorNoFichas(int i, int socket1, int socket2){
+	enviarMensaje(i, "\n+OK. Ha ganado la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+
+	if(i == socket1){
+		enviarMensaje(socket2, "\n+OK. Ha perdido la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+	}
+	else{
+		enviarMensaje(socket1, "\n+OK. Ha perdido la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+	}
+}
+
+
+void saberGanadorPuntos(Partida &p, int socket1, int socket2){
+	if(p.getJugador(socket1).getPuntos() < p.getJugador(socket2).getPuntos()){
+		enviarMensaje(socket1, "\n+OK. Ha ganado la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+		enviarMensaje(socket2, "\n+OK. Ha perdido la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+	}
+	else if(p.getJugador(socket2).getPuntos() < p.getJugador(socket1).getPuntos()){
+		enviarMensaje(socket2, "\n+OK. Ha ganado la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+		enviarMensaje(socket1, "\n+OK. Ha perdido la partida.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+	}
+	else if(p.getJugador(socket1).getPuntos() == p.getJugador(socket2).getPuntos()){
+		enviarMensaje(socket1, "\n+OK. Se acabó la partida. Han empatado a puntos.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+		enviarMensaje(socket2, "\n+OK. Se acabó la partida. Han empatado a puntos.\n\n+OK. Si quiere, puede iniciar otra partida.\n");
+	}
+}
 
 
 
