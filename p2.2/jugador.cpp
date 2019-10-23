@@ -19,7 +19,7 @@ int Jugador::getIDPartida(){
 
 int Jugador::getPuntos(){
 	int aux;
-	for(int i = 0; i < mano_.size(); i++){
+	for(unsigned int i = 0; i < mano_.size(); i++){
 		aux = mano_[i].getNI() + mano_[i].getND();
 		puntos_ += aux;
 	}
@@ -42,7 +42,7 @@ string Jugador::mostrarMano(){
 	char cad[250], I[10], D[10];
 
 	strcpy (cad,"\nFICHAS |");
-	for(int i = 0; i < mano_.size(); i++){
+	for(unsigned int i = 0; i < mano_.size(); i++){
 		sprintf(I, "%d", mano_[i].getNI());
 		sprintf(D, "%d", mano_[i].getND());
 		strcat (cad,I);
@@ -57,7 +57,7 @@ string Jugador::mostrarMano(){
 };
 
 bool Jugador::existeFicha(Ficha a){
-	for(int i = 0; i < mano_.size(); i++){
+	for(unsigned int i = 0; i < mano_.size(); i++){
 		if((a.getNI() == mano_[i].getNI()) && (a.getND() == mano_[i].getND())){
 			return true;
 		}
@@ -66,16 +66,16 @@ bool Jugador::existeFicha(Ficha a){
 };
 
 int Jugador::buscarFicha(Ficha a){
-	for(int i = 0; i < mano_.size(); i++){
+	for(unsigned int i = 0; i < mano_.size(); i++){
 		if((a.getNI() == mano_[i].getNI()) && (a.getND() == mano_[i].getND())){
 			return i;
 		}
 	}
-	return 100000;
+	return 100000;//Solo para evitar warning
 };
 
 bool Jugador::tieneDobles(){
-	for(int i = 0; i < mano_.size(); i++){
+	for(unsigned int i = 0; i < mano_.size(); i++){
 		if(mano_[i].esDoble()){
 			dobles_.push_back(mano_[i]);
 			//fflush(stdout);
@@ -112,7 +112,7 @@ Ficha Jugador::masAlta(){
 	int sumaMayor, aux;
 	mayor = mano_[0];
 	sumaMayor = mayor.getNI() + mayor.getND();
-	for(int i = 0; i < mano_.size(); i++){
+	for(unsigned int i = 0; i < mano_.size(); i++){
 		aux = mano_[i].getNI() + mano_[i].getND();
 		if(aux > sumaMayor){
 			mayor = mano_[i];
@@ -124,7 +124,7 @@ Ficha Jugador::masAlta(){
 
 bool Jugador::puedePoner(Partida *p){
 	if(p->tableroVacio()) return true;
-	for(int i = 0; i < mano_.size(); i++){
+	for(unsigned int i = 0; i < mano_.size(); i++){
 		if((p->getExtI() == mano_[i].getNI()) || (p->getExtI() == mano_[i].getND()) || (p->getExtD() == mano_[i].getNI()) || (p->getExtD() == mano_[i].getND())) return true;
 	}
 	return false;
@@ -224,6 +224,8 @@ bool Jugador::colocarFicha(int NI, int ND, int extremo, Partida *p){
 			}
 		}
 	}
+
+	return false; //Solo para evitar warning
 };
 
 

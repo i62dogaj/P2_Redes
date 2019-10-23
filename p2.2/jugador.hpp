@@ -21,7 +21,6 @@ class Jugador{
 
 	public:
 		//Constructor
-		Jugador(Partida *p);
 		Jugador(int id, Partida *p);
 
 		//OBSERVADORES

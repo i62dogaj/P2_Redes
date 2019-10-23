@@ -71,6 +71,7 @@ Jugador & Partida::getJugador(int socket){
   else if(socket == getSocket2()){
     return jugadores_[1];
   }
+
 };
 
 
@@ -84,11 +85,11 @@ Ficha Partida::getMasAlta(){
    los jugadores comprobarán si la tienen y comenzará el que
    la tenga. */
 Ficha Partida::iniciarPartida(){
-  int pos, sumaMayor, aux, k = 0;
+  int sumaMayor, aux;//, k = 0;
 	bool hayDobles = false;
   vector <Ficha> vec;
 	/* Primero comprueba si los jugadores tienen fichas dobles */
-  for(int i = 0; i < jugadores_.size(); i++){
+  for(unsigned int i = 0; i < jugadores_.size(); i++){
     if(jugadores_[i].tieneDobles()){
 			hayDobles = true;
 			fDobles_.push_back(jugadores_[i].dobleMasAlta());
@@ -101,13 +102,11 @@ Ficha Partida::iniciarPartida(){
 			fDobles_[i].mostrarFicha();
 		}*/
     setMasAlta(fDobles_[0]);
-	  pos = 0;
 		if(fDobles_.size() > 1){
-		  for(int i = 0; i < fDobles_.size(); i++){
+		  for(unsigned int i = 0; i < fDobles_.size(); i++){
 		    //Basta con comprobar uno de los valores
 		    if(masAlta_.getNI() < fDobles_[i].getNI()){
           setMasAlta(fDobles_[i]);
-		      pos = i;
 		    }
 		  }
 		}
@@ -129,7 +128,7 @@ Ficha Partida::iniciarPartida(){
 		}
     cout << endl;*/
 
-		for(int i = 0; i < jugadores_.size(); i++){
+		for(unsigned int i = 0; i < jugadores_.size(); i++){
 				fMayores_.push_back(jugadores_[i].masAlta());
 	  }
 		/*cout << "\n\n Fichas mayores:\n";
@@ -139,13 +138,11 @@ Ficha Partida::iniciarPartida(){
 		}*/
     setMasAlta(fMayores_[0]);
 		sumaMayor = fMayores_[0].getNI() + fMayores_[0].getND();
-	  pos = 0;
-	  for(int i = 0; i < fMayores_.size(); i++){
+	  for(unsigned int i = 0; i < fMayores_.size(); i++){
 	    aux = fMayores_[i].getNI() + fMayores_[i].getND();
 	    if(aux > sumaMayor){
         setMasAlta(fMayores_[i]);
 				sumaMayor = aux;
-	      pos = i;
 	    }
 	  }
 	}
@@ -165,7 +162,7 @@ bool Partida::montonVacio(){
 };
 
 bool Partida::buscarFichaMonton(Ficha a){
-	for(int i = 0; i < monton_.size(); i++){
+	for(unsigned int i = 0; i < monton_.size(); i++){
 		if((a.getNI() == monton_[i].getNI()) && (a.getND() == monton_[i].getND())){
 			return true;
 		}
@@ -204,7 +201,7 @@ string Partida::mostrarTablero(){
   }
   else{
     strcpy (cad,"\nTABLERO |");
-    for(int i = 0; i < tablero_.size(); i++){
+    for(unsigned int i = 0; i < tablero_.size(); i++){
   		sprintf(I, "%d", tablero_[i].getNI());
   		sprintf(D, "%d", tablero_[i].getND());
   		strcat (cad,I);
