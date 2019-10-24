@@ -343,6 +343,17 @@ int main ( )
 																														//hasta (tam_buffer-9) posiciones a la derecha
 
 										//CONTROL MISMO USUARIO NO PUEDA ESTAR LOGUEADO EN 2 TERMINALES AL MISMO TIEMPO
+
+                              /************** IMPORTANTE ****************/
+                              /*
+                              Ahora mismo tal y como esta, si metes "usuario pepe" en un cliente, como solo comprueba los usuarios y no los passwords
+                              con solo meter el usuario en un cliente ya no te va dejar loguearte con ese mismo usuario en ningun otro cliente
+                              hasta que el primero que metio "pepe" se salga, entonces se borraría "pepe" del vector usuarios y por lo tanto al hacer
+                              la comprobación que tenemos aquí debajo no saltaría error de ya estar en el sistema
+
+                              Resumen ->  una vez metido el usuario solo puedes loguearte en ese cliente
+                                          por lo tanto con solo meter usuario ya no va dejar a otros cliente loguearse con ese usuario
+                              */
 										for (size_t z = 0; z < usuarios.size(); z++) {
 											if (strcmp(usuarios[z].c_str(), usuario) == 0) {
 												enviarMensaje(i,"-ERR. Este usuario ya se encuentra logueado en el sistema, no puede iniciar sesión\n");
