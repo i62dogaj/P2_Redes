@@ -27,6 +27,7 @@ void enviarMensaje(int socket, const char *cadena){
 	send(socket,buffer,strlen(buffer),0);
 }
 
+/*
 void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]){
 
     char buffer[250];
@@ -50,6 +51,55 @@ void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClie
     for(j=0; j<(*numClientes); j++)
         if(arrayClientes[j] != socket)
             send(arrayClientes[j],buffer,strlen(buffer),0);
+}
+*/
+
+void salirCliente(int socket, fd_set * readfds, int *numClientes, int arrayClientes[], fd_set * usuario_correcto, fd_set * usuario_validado, fd_set * usuario_esperandoPartida, fd_set * usuario_jugando, std::map<int, std::string> & usuarios){
+	char buffer[250];
+	int j;
+
+	close(socket);
+	FD_CLR(socket,readfds);
+
+	if(FD_ISSET(socket, usuario_correcto)){
+		FD_CLR(socket, usuario_correcto);
+	}
+
+	if(FD_ISSET(socket, usuario_validado)){
+	   FD_CLR(socket, usuario_validado);
+	}
+
+	if(FD_ISSET(socket, usuario_esperandoPartida)){
+	   FD_CLR(socket, usuario_esperandoPartida);
+	}
+
+	if(FD_ISSET(socket, usuario_jugando)){
+	   FD_CLR(socket, usuario_jugando);
+	}
+
+	if(usuarios.find(socket)!=usuarios.end()){
+	   usuarios.erase(socket);
+	}
+
+	//Re-estructurar el array de clientes
+	for(j=0;j<(*numClientes)-1; j++){
+	   if(arrayClientes[j]==socket){
+	      break;
+	   }
+	}
+
+	for(;j<(*numClientes)-1;j++){
+	   (arrayClientes[j] = arrayClientes[j+1]);
+	}
+
+	(*numClientes)--;
+
+	bzero(buffer,sizeof(buffer));
+	sprintf(buffer,"Desconexión del cliente: %d\n",socket);
+
+	for(j=0; j<(*numClientes); j++)
+		 if(arrayClientes[j] != socket)
+			  send(arrayClientes[j],buffer,strlen(buffer),0);
 }
 
 

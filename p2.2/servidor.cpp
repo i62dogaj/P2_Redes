@@ -208,14 +208,15 @@ int main ( )
 
 								 if(strcmp(buffer,"SALIR\n") == 0){
 									 int who = i;
-									 salirCliente(i,&readfds,&numClientes,arrayClientes);
+									 salirCliente(i,&readfds,&numClientes,arrayClientes,&usuario_correcto, &usuario_validado, &usuario_esperandoPartida, &usuario_jugando, usuarios);
+                            //salirCliente(i,&readfds,&numClientes,arrayClientes);
 
 									 //Solo si estaba jugando cambiamos lo siguiente
 									 if (FD_ISSET(i, &usuario_jugando)){
 										 int idPartida, socket1, socket2;
 										 setIDPartidaySockets(i, partidas, idPartida, socket1, socket2);
 
-                     salirAmbos(partidas[idPartida], socket1, socket2, nPartidas);
+                               salirAmbos(partidas[idPartida], socket1, socket2, nPartidas);
 
 										if(who == socket1){
 											FD_SET(socket2, &usuario_validado);
@@ -324,10 +325,10 @@ int main ( )
 
 									else if(strstr(buffer, "USUARIO")!=NULL){
 
-										//if (FD_ISSET(i, &usuario_validado)) {
-										//	enviarMensaje(i,"-ERR. Usuario en estado validado, no puede iniciar sesión\n");
-										//	break;
-										//}
+                              /*if (FD_ISSET(i, &usuario_validado)) {
+											enviarMensaje(i,"-ERR. Usuario en estado validado, no puede iniciar sesión\n");
+											break;
+                              }*/
 
 
 										bool pedirContrasena=false; //variable para controlar si pedimos contraseña o no
@@ -341,7 +342,7 @@ int main ( )
 										strncpy(usuario, buffer+8, tamBuffer-9);//Metemos en usuario la cadena que va desde la posicion buffer+8
 																														//hasta (tam_buffer-9) posiciones a la derecha
 
-										//CONTROL MISMO USUARIO NO PUEDA LOGUEARSE 2 VECES
+										//CONTROL MISMO USUARIO NO PUEDA ESTAR LOGUEADO EN 2 TERMINALES AL MISMO TIEMPO
 										for (size_t z = 0; z < usuarios.size(); z++) {
 											if (strcmp(usuarios[z].c_str(), usuario) == 0) {
 												enviarMensaje(i,"-ERR. Este usuario ya se encuentra logueado en el sistema, no puede iniciar sesión\n");
@@ -388,6 +389,11 @@ int main ( )
 									PASSWORD
 									------------------------------------------------------------------------ */
 									else if(strstr(buffer, "PASSWORD")!=NULL){
+
+                              /*if (FD_ISSET(i, &usuario_validado)) {
+											enviarMensaje(i,"-ERR. Usuario en estado validado, no puede iniciar sesión\n");
+											break;
+                              }*/
 
 										if(FD_ISSET(i, &usuario_correcto)){//comprobamos que el usuario con este socket
 																					  //se encuentre en usuarios correctos (usuario bien introducido)
@@ -446,48 +452,53 @@ int main ( )
 										//enviarMensaje(i,"Usuario validado ha entrado en una partida\n");
 
 
-										//if(FD_ISSET(i, &usuario_jugando)){
-										//enviarMensaje(i,"Usuario en estado jugando, por lo tanto no puede iniciar partida\n");
-									//	break;
-										//}
+										/*if(FD_ISSET(i, &usuario_jugando)){
+										enviarMensaje(i,"Usuario en estado jugando, por lo tanto no puede iniciar partida\n");
+                              break;
+                              }*/
 
 
 
 										if(FD_ISSET(i, &usuario_validado)){//Comprobamos si el usuario esta validado para dejar entrar en una partida o no
 										//if(true){
 											if(nPartidas == 0){
-                        FD_SET(i, &usuario_esperandoPartida);
+                                    			FD_SET(i, &usuario_esperandoPartida);
 												nuevaPartida(nPartidas, partidas, i);
 											}
+
 											else if(nPartidas > 0){
-                        if (nPartidas <= MAX_PARTIDAS) {
-                          for (size_t z = 0; z < partidas.size(); z++) {
-  													if((partidas[z].getSocket1() == -1) && (estado == false)){
-  														estado = true;
-                              FD_SET(i, &usuario_esperandoPartida);
-  														nuevaPartidaEnPosicion(nPartidas, partidas, i, z);
-  													}
-  													else if((partidas[z].getSocket2() == -1) && (estado == false)){
-  														estado=true;
-                              lanzarPartida(partidas[z], fichas[z], i);
-                              FD_CLR(partidas[z].getSocket1(), &usuario_esperandoPartida);
-                            	FD_SET(partidas[z].getSocket1(), &usuario_jugando);
-                            	FD_SET(i, &usuario_jugando);
-                              //partidas[z].limpiarMonton(contadorFichas); //Para probar final 2 (BORRAR)
-  													}
-  												}
+                                   				if (nPartidas <= MAX_PARTIDAS) {
+                                       				for (size_t z = 0; z < partidas.size(); z++) {
+                                          				if((partidas[z].getSocket1() == -1) && (estado == false)){
+
+				                                            estado = true;
+				                                            FD_SET(i, &usuario_esperandoPartida);
+				                                            nuevaPartidaEnPosicion(nPartidas, partidas, i, z);
+
+                                          				}
+
+			                                          	else if((partidas[z].getSocket2() == -1) && (estado == false)){
+					 											estado=true;
+					                                        lanzarPartida(partidas[z], fichas[z], i);
+					                                        FD_CLR(partidas[z].getSocket1(), &usuario_esperandoPartida);
+					                                       	FD_SET(partidas[z].getSocket1(), &usuario_jugando);
+					                                       	FD_SET(i, &usuario_jugando);
+					                          				//partidas[z].limpiarMonton(contadorFichas); //Para probar final 2 (BORRAR)
+			                                          	}
+                                       }
+
                           // Si no ha encontrado ningún hueco en ninguna partida, crea una nueva.
-                          if((nPartidas != MAX_PARTIDAS) && (estado == false)){
-                            estado = true;
-                            FD_SET(i, &usuario_esperandoPartida);
-    												nuevaPartida(nPartidas, partidas, i);
+                                   if((nPartidas != MAX_PARTIDAS) && (estado == false)){
+                                     estado = true;
+                                     FD_SET(i, &usuario_esperandoPartida);
+                                     nuevaPartida(nPartidas, partidas, i);
     											}
   											}
-                        if((nPartidas == MAX_PARTIDAS) && (estado == false) && (!hayHueco(nPartidas, partidas))){
-  												enviarMensaje(i,"Demasiadas partidas comenzadas.\n");
-  											}
+                                 if((nPartidas == MAX_PARTIDAS) && (estado == false) && (!hayHueco(nPartidas, partidas))){
+     											enviarMensaje(i,"Demasiadas partidas comenzadas.\n");
+     										}
 												//FUERA DEL FOR. aqui he recorrido el vector entero y no he encontrado ningun espacio libre en ninguna partida
-											}
+										}
 
 
 									 }
@@ -753,7 +764,8 @@ int main ( )
 							 {
 								  printf("El socket %d, ha introducido ctrl+c\n", i);
 								  //Eliminar ese socket
-								  salirCliente(i,&readfds,&numClientes,arrayClientes);
+                          salirCliente(i,&readfds,&numClientes,arrayClientes,&usuario_correcto, &usuario_validado, &usuario_esperandoPartida, &usuario_jugando, usuarios);
+                          //salirCliente(i,&readfds,&numClientes,arrayClientes);
 							 }
 						}
 				  }
