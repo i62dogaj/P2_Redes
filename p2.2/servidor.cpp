@@ -208,29 +208,8 @@ int main ( )
 
 								 if(strcmp(buffer,"SALIR\n") == 0){
 									 int who = i;
-									 salirCliente(i,&readfds,&numClientes,arrayClientes,&usuario_correcto, &usuario_validado, &usuario_esperandoPartida, &usuario_jugando, usuarios);
+									 salirCliente(i, partidas, nPartidas, &readfds,&numClientes,arrayClientes,&usuario_correcto, &usuario_validado, &usuario_esperandoPartida, &usuario_jugando, usuarios);
                             //salirCliente(i,&readfds,&numClientes,arrayClientes);
-
-									 //Solo si estaba jugando cambiamos lo siguiente
-									 if (FD_ISSET(i, &usuario_jugando)){
-										 int idPartida, socket1, socket2;
-										 setIDPartidaySockets(i, partidas, idPartida, socket1, socket2);
-
-                               salirAmbos(partidas[idPartida], socket1, socket2, nPartidas);
-
-										if(who == socket1){
-											FD_SET(socket2, &usuario_validado);
-											FD_CLR(socket2, &usuario_jugando);
-
-											enviarMensaje(socket2,"+OK. Si quiere, puede iniciar otra partida.\n");
-										}
-										else{
-											FD_SET(socket1, &usuario_validado);
-											FD_CLR(socket1, &usuario_jugando);
-
-											enviarMensaje(socket1,"+OK. Si quiere, puede iniciar otra partida.\n");
-										}
-									}
 
 								 }
 
@@ -473,8 +452,7 @@ int main ( )
 										if(FD_ISSET(i, &usuario_validado)){//Comprobamos si el usuario esta validado para dejar entrar en una partida o no
 										//if(true){
 											if(nPartidas == 0){
-                                    			FD_SET(i, &usuario_esperandoPartida);
-												nuevaPartida(nPartidas, partidas, i);
+												nuevaPartida(nPartidas, partidas, i, &usuario_esperandoPartida);
 											}
 
 											else if(nPartidas > 0){
@@ -483,17 +461,13 @@ int main ( )
                                           				if((partidas[z].getSocket1() == -1) && (estado == false)){
 
 				                                            estado = true;
-				                                            FD_SET(i, &usuario_esperandoPartida);
-				                                            nuevaPartidaEnPosicion(nPartidas, partidas, i, z);
+				                                            nuevaPartidaEnPosicion(nPartidas, partidas, i, z, &usuario_esperandoPartida);
 
                                           				}
 
 			                                          	else if((partidas[z].getSocket2() == -1) && (estado == false)){
 					 											estado=true;
-					                                        lanzarPartida(partidas[z], fichas[z], i);
-					                                        FD_CLR(partidas[z].getSocket1(), &usuario_esperandoPartida);
-					                                       	FD_SET(partidas[z].getSocket1(), &usuario_jugando);
-					                                       	FD_SET(i, &usuario_jugando);
+					                                        lanzarPartida(partidas[z], fichas[z], i, &usuario_esperandoPartida, &usuario_jugando);
 					                          				//partidas[z].limpiarMonton(contadorFichas); //Para probar final 2 (BORRAR)
 			                                          	}
                                        }
@@ -501,8 +475,7 @@ int main ( )
                           // Si no ha encontrado ningún hueco en ninguna partida, crea una nueva.
                                    if((nPartidas != MAX_PARTIDAS) && (estado == false)){
                                      estado = true;
-                                     FD_SET(i, &usuario_esperandoPartida);
-                                     nuevaPartida(nPartidas, partidas, i);
+                                     nuevaPartida(nPartidas, partidas, i, &usuario_esperandoPartida);
     											}
   											}
                                  if((nPartidas == MAX_PARTIDAS) && (estado == false) && (!hayHueco(nPartidas, partidas))){
@@ -585,38 +558,23 @@ int main ( )
 													// ----------- FINAL POR QUEDARSE SIN FICHAS -----------
 													if(partidas[idPartida].getJugador(i).nFichas() == 0){
                             saberGanadorNoFichas(i, socket1, socket2);
-														salirAmbos(partidas[idPartida], socket1, socket2, nPartidas);
-                            FD_SET(socket1, &usuario_validado);
-                          	FD_SET(socket2, &usuario_validado);
-
-                          	FD_CLR(socket1, &usuario_jugando);
-                          	FD_CLR(socket2, &usuario_jugando);
+														salirAmbosFinal(partidas[idPartida], socket1, socket2, nPartidas, &usuario_validado, &usuario_jugando);
 													}
                           // ----------- FINAL POR PUNTOS -----------
                           else if((partidas[idPartida].montonVacio()) && (partidas[idPartida].getExtI() == partidas[idPartida].getExtD()) && (contadorFichas[partidas[idPartida].getExtI()] == 7)){
                             enviarMensaje(socket1, "\n+OK. La partida ya no puede avanzar.\n");
                             enviarMensaje(socket2, "\n+OK. La partida ya no puede avanzar.\n");
                             saberGanadorPuntos(partidas[idPartida], socket1, socket2);
-                            salirAmbos(partidas[idPartida], socket1, socket2, nPartidas);
-                            FD_SET(socket1, &usuario_validado);
-                          	FD_SET(socket2, &usuario_validado);
-
-                          	FD_CLR(socket1, &usuario_jugando);
-                          	FD_CLR(socket2, &usuario_jugando);
+                            salirAmbosFinal(partidas[idPartida], socket1, socket2, nPartidas, &usuario_validado, &usuario_jugando);
                           }
                           //Ninguno puede poner ni robar --> Terminamos la partida
                           else if((partidas[idPartida].montonVacio()) && (partidas[idPartida].getJugador(socket1).tieneFichas()) && (partidas[idPartida].getJugador(socket2).tieneFichas()) && (!partidas[idPartida].getJugador(socket1).puedePoner(&partidas[idPartida])) && (!partidas[idPartida].getJugador(socket2).puedePoner(&partidas[idPartida]))){
                             enviarMensaje(socket1, "\n+OK. La partida ya no puede avanzar.\n");
                             enviarMensaje(socket2, "\n+OK. La partida ya no puede avanzar.\n");
                             saberGanadorPuntos(partidas[idPartida], socket1, socket2);
-                            salirAmbos(partidas[idPartida], socket1, socket2, nPartidas);
-                            FD_SET(socket1, &usuario_validado);
-                            FD_SET(socket2, &usuario_validado);
-
-                            FD_CLR(socket1, &usuario_jugando);
-                            FD_CLR(socket2, &usuario_jugando);
+                            salirAmbosFinal(partidas[idPartida], socket1, socket2, nPartidas, &usuario_validado, &usuario_jugando);
                           }
-													else{
+													else{ //Si no se termina la partida por ningún motivo, continuamos
 														mostrarManoJugador(partidas[idPartida].getJugador(socket1), socket1);
 														mostrarManoJugador(partidas[idPartida].getJugador(socket2), socket2);
 
@@ -676,12 +634,7 @@ int main ( )
                               enviarMensaje(socket1, "\n+OK. La partida ya no puede avanzar.\n");
                               enviarMensaje(socket2, "\n+OK. La partida ya no puede avanzar.\n");
                               saberGanadorPuntos(partidas[idPartida], socket1, socket2);
-                              salirAmbos(partidas[idPartida], socket1, socket2, nPartidas);
-                              FD_SET(socket1, &usuario_validado);
-                            	FD_SET(socket2, &usuario_validado);
-
-                            	FD_CLR(socket1, &usuario_jugando);
-                            	FD_CLR(socket2, &usuario_jugando);
+                              salirAmbosFinal(partidas[idPartida], socket1, socket2, nPartidas, &usuario_validado, &usuario_jugando);
                             }
 														//Si no puede poner ni robar, pero el otro jugador sí puede poner --> Pasar turno
 														else if((partidas[idPartida].getJugador(socket1).tieneFichas()) && (partidas[idPartida].getJugador(socket2).tieneFichas()) && (!partidas[idPartida].getJugador(i).puedePoner(&partidas[idPartida])) && (partidas[idPartida].getJugador(otroSocket(i,partidas[idPartida])).puedePoner(&partidas[idPartida]))){
@@ -692,12 +645,7 @@ int main ( )
                               enviarMensaje(socket1, "\n+OK. La partida ya no puede avanzar.\n");
                               enviarMensaje(socket2, "\n+OK. La partida ya no puede avanzar.\n");
                               saberGanadorPuntos(partidas[idPartida], socket1, socket2);
-                              salirAmbos(partidas[idPartida], socket1, socket2, nPartidas);
-                              FD_SET(socket1, &usuario_validado);
-                            	FD_SET(socket2, &usuario_validado);
-
-                            	FD_CLR(socket1, &usuario_jugando);
-                            	FD_CLR(socket2, &usuario_jugando);
+                              salirAmbosFinal(partidas[idPartida], socket1, socket2, nPartidas, &usuario_validado, &usuario_jugando);
                             }
                         	}
 												}
@@ -775,7 +723,7 @@ int main ( )
 							 {
 								  printf("El socket %d, ha introducido ctrl+c\n", i);
 								  //Eliminar ese socket
-                          salirCliente(i,&readfds,&numClientes,arrayClientes,&usuario_correcto, &usuario_validado, &usuario_esperandoPartida, &usuario_jugando, usuarios);
+                          salirCliente(i,  partidas, nPartidas, &readfds,&numClientes,arrayClientes,&usuario_correcto, &usuario_validado, &usuario_esperandoPartida, &usuario_jugando, usuarios);
                           //salirCliente(i,&readfds,&numClientes,arrayClientes);
 							 }
 						}
