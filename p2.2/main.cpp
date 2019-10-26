@@ -73,7 +73,9 @@ int main(){
 				a = p.iniciarPartida();
 				//a.setNI(p.iniciarPartida().getNI());
 				//a.setND(p.iniciarPartida().getND());
-				//cout << "Ficha más alta:\n";
+				cout << "Ficha más alta:\n";
+				buffer = a.mostrarFicha();
+				cout << buffer << endl;
 				//a.mostrarFicha();
 				//cout << "\n	PUNTOS JUGADOR 0: " << j0.getPuntos() << endl;
 				//cout << "	PUNTOS JUGADOR 1: " << j1.getPuntos() << endl << endl;

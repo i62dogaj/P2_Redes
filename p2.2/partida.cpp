@@ -85,10 +85,11 @@ Ficha Partida::getMasAlta(){
    los jugadores comprobarán si la tienen y comenzará el que
    la tenga. */
 Ficha Partida::iniciarPartida(){
-  int sumaMayor, aux;//, k = 0;
+  int sumaMayor, aux, k = 0;
 	bool hayDobles = false;
   vector <Ficha> vec;
-	/* Primero comprueba si los jugadores tienen fichas dobles */
+	/* Primero comprueba si los jugadores tienen fichas dobles_
+    y las mete en el vector fDobles_. */
   for(unsigned int i = 0; i < jugadores_.size(); i++){
     if(jugadores_[i].tieneDobles()){
 			hayDobles = true;
@@ -96,6 +97,7 @@ Ficha Partida::iniciarPartida(){
 		}
   }
 	if(hayDobles){
+    //cout << "Hay dobles\n";
 		/*cout << "\n\n Fichas dobles:\n";
 		for(int i = 0; i < fDobles_.size(); i++){
 			fflush(stdout);
@@ -110,11 +112,13 @@ Ficha Partida::iniciarPartida(){
 		    }
 		  }
 		}
+    return getMasAlta();
 	}
 	/* Si ningún jugador tiene fichas dobles, se pasaría a comprobar
 	   la siguiente ficha más alta y comenzará quien la tenga.*/
 	else if(!hayDobles){
-    /*//Creamos un vector con 21 fichas (sin dobles) para comparar
+    //cout << "No hay dobles\n";
+    //Creamos un vector con 21 fichas (sin dobles) para comparar
   	for(int i = k; i < 7; i++){
   		for(int j = k; j < 7; j++){
   			Ficha a(i,j);
@@ -124,31 +128,21 @@ Ficha Partida::iniciarPartida(){
   	}
     cout << "\n Vector sin dobles: \n\n ";
 		for(int i = 0; i < vec.size(); i++){
-			cout << "|" << vec[i].getNI() << "|" << vec[i].getND() << "|";
+			cout << "|" << vec[i].getNI() << "|" << vec[i].getND() << "|\n";
 		}
-    cout << endl;*/
+    cout << endl;
 
-		for(unsigned int i = 0; i < jugadores_.size(); i++){
-				fMayores_.push_back(jugadores_[i].masAlta());
-	  }
-		/*cout << "\n\n Fichas mayores:\n";
-		for(int i = 0; i < fMayores_.size(); i++){
-			fflush(stdout);
-			fMayores_[i].mostrarFicha();
-		}*/
-    setMasAlta(fMayores_[0]);
-		sumaMayor = fMayores_[0].getNI() + fMayores_[0].getND();
-	  for(unsigned int i = 0; i < fMayores_.size(); i++){
-	    aux = fMayores_[i].getNI() + fMayores_[i].getND();
-	    if(aux > sumaMayor){
-        setMasAlta(fMayores_[i]);
-				sumaMayor = aux;
-	    }
+		for(unsigned int i = (vec.size()-1); i >= 0; i--){
+      cout << "|" << vec[i].getNI() << "|" << vec[i].getND() << "|\n";
+				for(unsigned int j = 0; i < jugadores_.size(); i++){
+          if(jugadores_[j].existeFicha(vec[i])){
+            cout << "Mayor: |" << vec[i].getNI() << "|" << vec[i].getND() << "|\n";
+            return vec[i];
+          }
+        }
 	  }
 	}
-	/* Devolvemos la ficha mayor, doble o no, y los jugadores_
-     comprobarán si la tienen, comenzando aquel que la tenga.*/
-	return getMasAlta();
+
 };
 
 bool Partida::tableroVacio(){

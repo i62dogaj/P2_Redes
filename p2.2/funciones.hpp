@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <vector>
+#include <map>
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -27,8 +28,27 @@ void enviarMensaje(int socket, const char *cadena){
 	send(socket,buffer,strlen(buffer),0);
 }
 
-/*
-void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]){
+void setIDPartidaySockets(int &i, std::vector<Partida> &partidas, int &idPartida, int &socket1, int &socket2){
+	for(unsigned int z = 0; z < partidas.size(); z++){
+		if((partidas[z].getSocket1() == i) || (partidas[z].getSocket2() == i)){
+			idPartida = z;
+		}
+	}
+
+ socket1 = partidas[idPartida].getSocket1();
+ socket2 = partidas[idPartida].getSocket2();
+}
+
+void salirAmbos(Partida &p, int socket1, int socket2, int &nPartidas){
+	p.getJugador(socket1).salirPartida(&p);
+	p.getJugador(socket2).salirPartida(&p);
+	p.setSocket1(-1);
+	p.setSocket2(-1);
+	nPartidas--;
+}
+
+
+/*void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]){
 
     char buffer[250];
     int j;
@@ -51,15 +71,16 @@ void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClie
     for(j=0; j<(*numClientes); j++)
         if(arrayClientes[j] != socket)
             send(arrayClientes[j],buffer,strlen(buffer),0);
-}
-*/
+}*/
 
-void salirCliente(int socket, fd_set * readfds, int *numClientes, int arrayClientes[], fd_set * usuario_correcto, fd_set * usuario_validado, fd_set * usuario_esperandoPartida, fd_set * usuario_jugando, std::map<int, std::string> & usuarios){
+
+void salirCliente(int socket, std::vector<Partida> &partidas, int &nPartidas, fd_set * readfds, int *numClientes, int arrayClientes[], fd_set * usuario_correcto, fd_set * usuario_validado, fd_set * usuario_esperandoPartida, fd_set * usuario_jugando, std::map<int, std::string> & usuarios){
 	char buffer[250];
 	int j;
 
 	close(socket);
 	FD_CLR(socket,readfds);
+
 
 	if(FD_ISSET(socket, usuario_correcto)){
 		FD_CLR(socket, usuario_correcto);
@@ -71,10 +92,6 @@ void salirCliente(int socket, fd_set * readfds, int *numClientes, int arrayClien
 
 	if(FD_ISSET(socket, usuario_esperandoPartida)){
 	   FD_CLR(socket, usuario_esperandoPartida);
-	}
-
-	if(FD_ISSET(socket, usuario_jugando)){
-	   FD_CLR(socket, usuario_jugando);
 	}
 
 	if(usuarios.find(socket)!=usuarios.end()){
@@ -100,18 +117,29 @@ void salirCliente(int socket, fd_set * readfds, int *numClientes, int arrayClien
 	for(j=0; j<(*numClientes); j++)
 		 if(arrayClientes[j] != socket)
 			  send(arrayClientes[j],buffer,strlen(buffer),0);
-}
 
+	//Solo si estaba jugando, cambiamos lo siguiente
+	if (FD_ISSET(socket, usuario_jugando)){
+		int idPartida, socket1, socket2;
+		setIDPartidaySockets(socket, partidas, idPartida, socket1, socket2);
 
-void setIDPartidaySockets(int &i, std::vector<Partida> &partidas, int &idPartida, int &socket1, int &socket2){
-	for(unsigned int z = 0; z < partidas.size(); z++){
-		if((partidas[z].getSocket1() == i) || (partidas[z].getSocket2() == i)){
-			idPartida = z;
-		}
+							salirAmbos(partidas[idPartida], socket1, socket2, nPartidas);
+
+	 if(socket == socket1){
+		 FD_SET(socket2, usuario_validado);
+		 FD_CLR(socket2, usuario_jugando);
+
+		 enviarMensaje(socket2,"+OK. Si quiere, puede iniciar otra partida.\n");
+	 }
+	 else{
+		 FD_SET(socket1, usuario_validado);
+		 FD_CLR(socket1, usuario_jugando);
+
+		 enviarMensaje(socket1,"+OK. Si quiere, puede iniciar otra partida.\n");
+	 }
+
+	 FD_CLR(socket, usuario_jugando);
 	}
-
- socket1 = partidas[idPartida].getSocket1();
- socket2 = partidas[idPartida].getSocket2();
 }
 
 
@@ -143,22 +171,26 @@ void decidirTurno(int i, int socket1, int socket2, Partida &p){
 }
 
 
-void nuevaPartida(int &nPartidas, vector<Partida> &partidas, int i){
+void nuevaPartida(int &nPartidas, vector<Partida> &partidas, int i, fd_set * usuario_esperandoPartida){
 		Partida nuevo;
 		nuevo.setSocket1(i);
 		nuevo.setIDPartida(partidas.size());
 		partidas.push_back(nuevo);
 		nPartidas++;
 
+		FD_SET(i, usuario_esperandoPartida);
+
 		enviarMensaje(i,"+Ok. Petición Recibida. Quedamos a la espera de más jugadores\0");
 }
 
-void nuevaPartidaEnPosicion(int &nPartidas, vector<Partida> &partidas, int i, int pos){
+void nuevaPartidaEnPosicion(int &nPartidas, vector<Partida> &partidas, int i, int pos, fd_set * usuario_esperandoPartida){
 		Partida nuevo;
 		nuevo.setSocket1(i);
 		partidas[pos] = nuevo;
 		partidas[pos].setIDPartida(pos);
 		nPartidas++;
+
+		FD_SET(i, usuario_esperandoPartida);
 
 		enviarMensaje(i,"+Ok. Petición Recibida. Quedamos a la espera de más jugadores\0");
 }
@@ -200,7 +232,7 @@ int otroSocket(int socket, Partida &p){
 
 
 
-void lanzarPartida(Partida &p, Ficha &a, int i){
+void lanzarPartida(Partida &p, Ficha &a, int i, fd_set * usuario_esperandoPartida, fd_set * usuario_jugando){
 	int socket1=p.getSocket1();
 
 	p.setSocket2(i);
@@ -221,6 +253,10 @@ void lanzarPartida(Partida &p, Ficha &a, int i){
 
 	a = p.iniciarPartida();
 	p.setMasAlta(a);
+
+	FD_CLR(socket1, usuario_esperandoPartida);
+	FD_SET(socket1, usuario_jugando);
+	FD_SET(i, usuario_jugando);
 
 /*	bzero(buffer, sizeof(buffer));
 	sprintf(buffer, "Partida %d:", p.getIDPartida());
@@ -248,12 +284,18 @@ bool hayHueco(int nPartidas, vector<Partida> &partidas){
 };
 
 
-void salirAmbos(Partida &p, int socket1, int socket2, int &nPartidas){
+void salirAmbosFinal(Partida &p, int socket1, int socket2, int &nPartidas, fd_set * usuario_validado, fd_set * usuario_jugando){
 	p.getJugador(socket1).salirPartida(&p);
 	p.getJugador(socket2).salirPartida(&p);
 	p.setSocket1(-1);
 	p.setSocket2(-1);
 	nPartidas--;
+
+	FD_SET(socket1, usuario_validado);
+	FD_SET(socket2, usuario_validado);
+
+	FD_CLR(socket1, usuario_jugando);
+	FD_CLR(socket2, usuario_jugando);
 }
 
 
