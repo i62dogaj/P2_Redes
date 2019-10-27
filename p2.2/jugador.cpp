@@ -58,7 +58,7 @@ string Jugador::mostrarMano(){
 
 bool Jugador::existeFicha(Ficha a){
 	for(unsigned int i = 0; i < mano_.size(); i++){
-		if((a.getNI() == mano_[i].getNI()) && (a.getND() == mano_[i].getND())){
+		if(((a.getNI() == mano_[i].getNI()) && (a.getND() == mano_[i].getND())) or ((a.getNI() == mano_[i].getND()) && (a.getND() == mano_[i].getNI()))){
 			return true;
 		}
 	}
@@ -107,16 +107,17 @@ Ficha Jugador::dobleMasAlta(){
 	return mayor;
 };
 
-Ficha Jugador::masAlta(){
+Ficha Jugador::masAltaSimple(){
 	Ficha mayor;
-	int sumaMayor, aux;
-	mayor = mano_[0];
-	sumaMayor = mayor.getNI() + mayor.getND();
-	for(unsigned int i = 0; i < mano_.size(); i++){
-		aux = mano_[i].getNI() + mano_[i].getND();
-		if(aux > sumaMayor){
-			mayor = mano_[i];
-			sumaMayor = aux;
+	std::vector <Ficha> vec = getMano();
+	for(unsigned int i = 0; i < 7; i++){
+		for(unsigned int j = 0; j < 7 ; j++){
+			for(unsigned int k = 0; k < 7; k++){
+				if(((i == vec[k].getNI()) && (j == vec[k].getND())) or ((i == vec[k].getND()) && (j == vec[k].getNI()))){
+					mayor.setNI(i);
+					mayor.setND(j);
+				}
+			}
 		}
 	}
 	return mayor;
