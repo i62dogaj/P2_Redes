@@ -35,7 +35,7 @@ class Jugador{
 		int buscarFicha(Ficha a);
 		bool tieneDobles();
 	  Ficha dobleMasAlta();
-		Ficha masAlta();
+		Ficha masAltaSimple();
 		bool puedePoner(Partida *p);
 		bool tieneFichas();
 

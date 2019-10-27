@@ -234,6 +234,7 @@ int otroSocket(int socket, Partida &p){
 
 void lanzarPartida(Partida &p, Ficha &a, int i, fd_set * usuario_esperandoPartida, fd_set * usuario_jugando){
 	int socket1=p.getSocket1();
+	//char buffer[250];
 
 	p.setSocket2(i);
 	int socket2=p.getSocket2();
@@ -263,10 +264,10 @@ void lanzarPartida(Partida &p, Ficha &a, int i, fd_set * usuario_esperandoPartid
 	cout << buffer << endl;
 
 	bzero(buffer, sizeof(buffer));
-	sprintf(buffer, "%s\n", a.mostrarFicha().c_str());
+	sprintf(buffer, "Ficha mayor: %s\n", a.mostrarFicha().c_str());
 	cout << buffer << endl << endl;*/
 
-	//Comprobar quien tiene el doble más alto o la ficha mas mas alta
+	//Comprobar quién tiene el doble más alto o la ficha más alta
 	//Y decirle a este que es su turno y al otro que espere
 	decidirTurnoInicial(j1, j2, a, socket1, socket2, p);
 }

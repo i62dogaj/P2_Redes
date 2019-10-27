@@ -20,7 +20,6 @@ class Partida{
     vector <Ficha> tablero_;
     vector <Jugador> jugadores_; //Para indicar el orden de juego
     vector <Ficha> fDobles_; //Para las fichas dobles al iniciar la partida
-		vector <Ficha> fMayores_; //Para las fichas mayores al iniciar partida si no hubiera dobles
     Ficha masAlta_;
 
     int socket1_;
@@ -39,7 +38,6 @@ class Partida{
     vector<Ficha> getMonton();
     vector<Ficha> getTablero();
     vector<Ficha> getFichasDobles();
-    vector<Ficha> getFichasMayores();
     Ficha getMasAlta();
     Ficha iniciarPartida();
     bool tableroVacio();
@@ -53,6 +51,8 @@ class Partida{
     int getTurno();
     Jugador &getJugador(int socket);
 
+    int compararFichas(Ficha f1, Ficha f2);
+
 
 		//MODIFICADORES
     void setIDPartida(int id);
@@ -60,7 +60,6 @@ class Partida{
     void setMonton(vector <Ficha> vec);
     void setTablero(vector <Ficha> vec);
     void setFichasDobles(vector <Ficha> vec);
-    void setFichasMayores(vector <Ficha> vec);
     void setMasAlta(Ficha a);
     void masNJugadores();
     void menosNJugadores();

@@ -222,16 +222,9 @@ int main ( )
 									{
 										//PONER USUARIO A ESTADO VALIDADO CUANDO SE REGISTRE CORRECTAMENTE
 
-										if (FD_ISSET(i, &usuario_correcto)) {
-											enviarMensaje(i,"-ERR. Usuario en estado correcto, no puede registrarse\n");
-											break;
-										}
 
-										if (FD_ISSET(i, &usuario_validado)) {
-											enviarMensaje(i,"-ERR. Usuario en estado validado, no puede registrarse\n");
-											break;
-										}
-
+                    //if((FD_ISSET(i, &usuario_correcto) == 0) && (FD_ISSET(i, &usuario_validado) == 0)){
+                    bool enServidor = false;
 										bool anadir=true;
 										char *auxUser1, *auxUser2, *auxPasswd1;
 										char usuario[20], contrasena[20];
@@ -265,36 +258,57 @@ int main ( )
 										//Con estos -1 quitamos los '\n' || lenght_aux_user2 -> Tamaño desde " -p" hasta el final del buffer
 										int tamBuffer=strlen(buffer)-1, tamAuxUser2=strlen(auxUser2)-1, tamAuxPasswd1=strlen(auxPasswd1)-1;
 
-										strncpy(usuario, auxUser1+3, tamBuffer-tamAuxUser2-12);//metemos en user, desde esa posicion, un numero x de bytes
+										strncpy(usuario, auxUser1+3, tamBuffer-tamAuxUser2-12);//metemos en usuario, desde esa posicion, un numero x de bytes
 										strncpy(contrasena, auxPasswd1+3, tamAuxPasswd1-3);
 
-
-										file.open("usuarios.txt", std::fstream::in);
-
-										//Controlamos si el usuario a registrar se encuentra ya en el archivo
-										while(std::getline(file,lineaFichero))//metemos en linea_fichero usuario y contraseña (linea completa del fichero)
-										{
-											busquedaUsuario=lineaFichero.substr(0, strlen(usuario)); //metemos en busqueda_usuario solo el usuario
-											if(strcmp(busquedaUsuario.c_str(), usuario)==0)
-											{
-												anadir=false;
-												enviarMensaje(i,"-ERR. Usuario existente\n");
-												break;
+                    for (size_t z = 0; z < usuarios.size(); z++) {
+											if (strcmp(usuarios[z].c_str(), usuario) == 0) {
+												enServidor = true;
 											}
 										}
 
-										file.close();
-										file.open("usuarios.txt", std::fstream::app);
+                    if(enServidor == false){
 
-										//Si anadir sigue siendo true (usuario no encontrado en el archivo) entonces lo introducimos
-										//Si añadir false, quiere decir que el usuario ya se encuentra en el archivo
-										//Por lo tanto no lo metemos
-										if(anadir)
-										{
-											file << usuario << " " << contrasena << "\n";
-											enviarMensaje(i,"+Ok. Usuario Registrado\n");
-										}
-										file.close();
+  										file.open("usuarios.txt", std::fstream::in);
+
+  										//Controlamos si el usuario a registrar se encuentra ya en el archivo
+  										while(std::getline(file,lineaFichero))//metemos en linea_fichero usuario y contraseña (linea completa del fichero)
+  										{
+  											busquedaUsuario=lineaFichero.substr(0, strlen(usuario)); //metemos en busqueda_usuario solo el usuario
+  											if(strcmp(busquedaUsuario.c_str(), usuario)==0)
+  											{
+  												anadir=false;
+  												enviarMensaje(i,"-ERR. Usuario existente\n");
+  												break;
+  											}
+  										}
+
+  										file.close();
+  										file.open("usuarios.txt", std::fstream::app);
+
+  										//Si anadir sigue siendo true (usuario no encontrado en el archivo) entonces lo introducimos
+  										//Si añadir false, quiere decir que el usuario ya se encuentra en el archivo
+  										//Por lo tanto no lo metemos
+  										if(anadir)
+  										{
+  											file << usuario << " " << contrasena << "\n";
+  											enviarMensaje(i,"+Ok. Usuario Registrado\n");
+  										}
+  										file.close();
+                    }
+
+                    if(enServidor == true){
+                      //enviarMensaje(i,"-ERR. Ya ha iniciado sesión, no puede registrarse\n");
+                      //break;
+                      if (FD_ISSET(i, &usuario_correcto)) {
+  											enviarMensaje(i,"-ERR. Usuario en estado correcto, no puede registrarse\n");
+  											break;
+  										}
+                      else if (FD_ISSET(i, &usuario_validado)) {
+  											enviarMensaje(i,"-ERR. Usuario en estado validado, no puede registrarse\n");
+  											break;
+  										}
+                    }
 
 									}//CIERRE REGISTRO
 
@@ -327,7 +341,7 @@ int main ( )
                               /*
                               Ahora mismo tal y como esta, si metes "usuario pepe" en un cliente, como solo comprueba los usuarios y no los passwords
                               con solo meter el usuario en un cliente ya no te va dejar loguearte con ese mismo usuario en ningun otro cliente
-                              hasta que el primero que metio "pepe" se salga, entonces se borraría "pepe" del vector usuarios y por lo tanto al hacer
+                              hasta que el primero que metió "pepe" se salga, entonces se borraría "pepe" del vector usuarios y por lo tanto al hacer
                               la comprobación que tenemos aquí debajo no saltaría error de ya estar en el sistema
 
                               Resumen ->  una vez metido el usuario solo puedes loguearte en ese cliente
@@ -439,27 +453,33 @@ int main ( )
 
 										bool estado=false;
 
-										//enviarMensaje(i,"Usuario validado ha entrado en una partida\n");
 
-
-										/*if(FD_ISSET(i, &usuario_jugando)){
-										enviarMensaje(i,"Usuario en estado jugando, por lo tanto no puede iniciar partida\n");
-                              break;
-                              }*/
-
+                    if(FD_ISSET(i, &usuario_esperandoPartida)){
+                      enviarMensaje(i,"-ERR. Usuario ya esperando a otro jugador. No puede iniciar partida.\n");
+                      break;
+                    }
+                    else if(FD_ISSET(i, &usuario_jugando)){
+                      enviarMensaje(i,"-ERR. Usuario jugando. No puede iniciar partida.\n");
+                      break;
+                    }
 
 
 										if(FD_ISSET(i, &usuario_validado)){//Comprobamos si el usuario esta validado para dejar entrar en una partida o no
 										//if(true){
-											if(nPartidas == 0){
+											if(partidas.size() == 0){
 												nuevaPartida(nPartidas, partidas, i, &usuario_esperandoPartida);
 											}
+                      else if((nPartidas == 0) && (partidas.size() != 0)){
+                        if((partidas[0].getSocket1() == -1) && (estado == false)){
+                          estado = true;
+                          nuevaPartidaEnPosicion(nPartidas, partidas, i, 0, &usuario_esperandoPartida);
 
-											else if(nPartidas > 0){
-                                   				if (nPartidas <= MAX_PARTIDAS) {
+                        }
+                      }
+											else if((nPartidas > 0) || (partidas.size() != 0)){
+                                   				if ((nPartidas <= MAX_PARTIDAS) || (partidas.size() != 0)) {
                                        				for (size_t z = 0; z < partidas.size(); z++) {
                                           				if((partidas[z].getSocket1() == -1) && (estado == false)){
-
 				                                            estado = true;
 				                                            nuevaPartidaEnPosicion(nPartidas, partidas, i, z, &usuario_esperandoPartida);
 
@@ -479,7 +499,6 @@ int main ( )
     											}
   											}
                                  if((nPartidas == MAX_PARTIDAS) && (estado == false) && (!hayHueco(nPartidas, partidas))){
-     											enviarMensaje(i,"Demasiadas partidas comenzadas.\n");
      										}
 												//FUERA DEL FOR. aqui he recorrido el vector entero y no he encontrado ningun espacio libre en ninguna partida
 										}
@@ -535,9 +554,6 @@ int main ( )
 											izquierdo = atoi(izquierda);
 											derecho = atoi(derecha);
 
-											//El ahorcamiento por aqui y así queda todo bien ordenadito
-
-
 											int idPartida, socket1, socket2;
  										 	setIDPartidaySockets(i, partidas, idPartida, socket1, socket2);
 
@@ -591,7 +607,7 @@ int main ( )
 
 					                   }
 					                   else{
-																enviarMensaje(i, "-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\n");
+																enviarMensaje(i, "-ERR. No está dentro de una partida, por lo que no puede colocar ficha.\n");
 					                   }
 					       			}//CIERRE COLOCAR-FICHA
 
@@ -656,7 +672,7 @@ int main ( )
 										}
 
 										else{
-					                      enviarMensaje(i,"-ERR. No esta dentro de una partida por lo tanto no puede colocar ficha\n");
+					                      enviarMensaje(i,"-ERR. No está dentro de una partida, por lo que no puede robar ficha.\n");
 					                   }
 
 									}//CIERRE ROBAR-FICHA
@@ -689,7 +705,7 @@ int main ( )
 										}
 
 										else{
-	                      enviarMensaje(i,"-ERR. No esta dentro de una partida por lo tanto no puede pasar turno\n");
+	                      enviarMensaje(i,"-ERR. No está dentro de una partida, por lo que no puede pasar turno.\n");
 	                   }
 
 									}//CIERRE PASO-TURNO
@@ -697,7 +713,7 @@ int main ( )
 									/*-----------------------------------------------------------------------
 									IDPARTIDA
 									------------------------------------------------------------------------ */
-									else if(strcmp(buffer, "IDPARTIDA\n")==0){
+									/*else if(strcmp(buffer, "IDPARTIDA\n")==0){
 
 										if((FD_ISSET(i, &usuario_jugando)) || (FD_ISSET(i, &usuario_esperandoPartida))){
 
@@ -709,8 +725,11 @@ int main ( )
 											sprintf(buffer, "PARTIDA %d\n", partidas[idPartida].getJugador(i).getIDPartida());
 											send(i,buffer,strlen(buffer),0);
 										}
+                    else{
+	                      enviarMensaje(i,"-ERR. No está dentro de una partida ni esperando a otro jugador, por lo que no tiene ID de Partida.\n");
+	                   }
 
-									}//CIERRE IDPARTIDA
+									}//CIERRE IDPARTIDA*/
 
 
 									else{
