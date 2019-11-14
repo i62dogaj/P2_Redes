@@ -168,6 +168,21 @@ int main ( )
 										numClientes++;
 										FD_SET(new_sd,&readfds);
 
+                              //INICIALIZACIÓN DE VARIABLES DE ESTADO
+                              if (FD_ISSET(new_sd, &usuario_correcto)) {
+                                 FD_CLR(new_sd, &usuario_correcto);
+                              }
+                              if (FD_ISSET(new_sd, &usuario_validado)) {
+                                 FD_CLR(new_sd, &usuario_validado);
+                              }
+                              if (FD_ISSET(new_sd, &usuario_esperandoPartida)) {
+                                 FD_CLR(new_sd, &usuario_esperandoPartida);
+                              }
+                              if (FD_ISSET(new_sd, &usuario_jugando)) {
+                                 FD_CLR(new_sd, &usuario_jugando);
+                              }
+
+
 										enviarMensaje(new_sd, "+Ok. Usuario conectado\n");
 
 										for(j=0; j<(numClientes-1);j++){
@@ -223,8 +238,17 @@ int main ( )
 										//PONER USUARIO A ESTADO VALIDADO CUANDO SE REGISTRE CORRECTAMENTE
 
 
-                    //if((FD_ISSET(i, &usuario_correcto) == 0) && (FD_ISSET(i, &usuario_validado) == 0)){
-                    bool enServidor = false;
+                              if(FD_ISSET(i, &usuario_correcto)){
+                                 enviarMensaje(i,"-ERR. Se encuentra en estado correcto, no puede registrase en este momento\n");
+											break;
+                              }
+
+                              if(FD_ISSET(i, &usuario_validado)){
+                                 enviarMensaje(i,"-ERR. Se encuentra en estado validado, no puede registrase en este momento\n");
+											break;
+                              }
+
+                              bool enServidor = false;
 										bool anadir=true;
 										char *auxUser1, *auxUser2, *auxPasswd1;
 										char usuario[20], contrasena[20];
@@ -318,10 +342,10 @@ int main ( )
 
 									else if(strstr(buffer, "USUARIO")!=NULL){
 
-                              /*if (FD_ISSET(i, &usuario_validado)) {
-											enviarMensaje(i,"-ERR. Usuario en estado validado, no puede iniciar sesión\n");
+                              if (FD_ISSET(i, &usuario_validado)) {
+											enviarMensaje(i,"-ERR. Se encuentra en estado validado, no puede introducir el usuario\n");
 											break;
-                              }*/
+                              }
 
 
 										bool pedirContrasena=false; //variable para controlar si pedimos contraseña o no
@@ -394,10 +418,10 @@ int main ( )
 									------------------------------------------------------------------------ */
 									else if(strstr(buffer, "PASSWORD")!=NULL){
 
-                              /*if (FD_ISSET(i, &usuario_validado)) {
-											enviarMensaje(i,"-ERR. Usuario en estado validado, no puede iniciar sesión\n");
+                              if (FD_ISSET(i, &usuario_validado)) {
+											enviarMensaje(i,"-ERR. Se encuentra en estado validado, no puede introducir contraseña\n");
 											break;
-                              }*/
+                              }
 
 										if(FD_ISSET(i, &usuario_correcto)){//comprobamos que el usuario con este socket
 																					  //se encuentre en usuarios correctos (usuario bien introducido)
